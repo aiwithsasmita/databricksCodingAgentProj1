@@ -1,0 +1,38 @@
+{
+  "policy_id": "UHC-POL-2026-0005A",
+  "policy_name": "Global Days Policy, Professional",
+  "patterns": [
+    {
+      "pattern_id": "FP-GD-001",
+      "pattern_name": "E/M Services During Global Period Without Modifier 24",
+      "description": "Detect E/M services (99201-99215, 99221-99239) billed during the global period of a surgical procedure without modifier 24. This indicates the E/M service may be bundled with the surgical procedure and should not be separately billed.",
+      "severity": "HIGH",
+      "nlp_description": "Find all claims where an E/M service (evaluation and management codes like 99213, 99214) was billed during the global period of a surgical procedure (procedures with 010 or 090 global days) by the same provider or same TIN/specialty, and the E/M claim is missing modifier 24 (unrelated evaluation and management service).",
+      "detection_logic": {
+        "step1": "Identify all surgical procedures with global days values of 010 or 090",
+        "step2": "Calculate the global period end date for each surgical procedure (service_date + global_days_value days)",
+        "step3": "Find all E/M services (em_code IS NOT NULL) that occurred within the global period",
+        "step4": "Filter for claims from same provider OR same TIN + specialty",
+        "step5": "Filter for claims where modifier_24 is NULL (missing)",
+        "step6": "Return the fraudulent claims with relevant details"
+      },
+      "expected_columns": [
+        "claim_id",
+        "patient_id", 
+        "provider_npi",
+        "em_service_date",
+        "em_code",
+        "modifier_24",
+        "surgical_claim_id",
+        "surgical_date",
+        "procedure_code",
+        "global_days_value",
+        "days_after_surgery"
+      ],
+      "tables_used": [
+        "fraud_detection.test_data.claims"
+      ]
+    }
+  ]
+}
+
