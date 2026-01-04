@@ -154,3 +154,4 @@ class SQLStorage:
         # Full parsing would require more complex logic
         return True
 
+
