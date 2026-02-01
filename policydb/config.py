@@ -4,7 +4,9 @@ Configuration file for the Policy Extraction Pipeline.
 All paths and settings are centralized here.
 """
 import os
+import logging
 from pathlib import Path
+from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -16,6 +18,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"                          # Raw policy .txt files
 INPUT_DIR = BASE_DIR / "input"                        # Attachment Excel/CSV files
+LOGS_DIR = BASE_DIR / "logs"                          # Log files
 
 # =============================================================================
 # OUTPUT DIRECTORIES (Created automatically)
@@ -29,8 +32,86 @@ OUTPUT_NEO4J_DIR = BASE_DIR / "neo4j_ready"           # Agent 5: Final Neo4j-rea
 
 # Create all output directories
 for dir_path in [OUTPUT_METADATA_DIR, OUTPUT_DENIAL_DIR, OUTPUT_DENIAL_VAL_DIR,
-                 OUTPUT_FRAUD_DIR, OUTPUT_FRAUD_VAL_DIR, OUTPUT_NEO4J_DIR]:
+                 OUTPUT_FRAUD_DIR, OUTPUT_FRAUD_VAL_DIR, OUTPUT_NEO4J_DIR, LOGS_DIR]:
     dir_path.mkdir(exist_ok=True)
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+def setup_logger(agent_name: str) -> logging.Logger:
+    """Setup logger for an agent with file and console handlers."""
+    logger = logging.getLogger(agent_name)
+    logger.setLevel(logging.DEBUG)
+    
+    # Clear existing handlers
+    logger.handlers = []
+    
+    # File handler - detailed logs
+    log_file = LOGS_DIR / f"{agent_name}_{datetime.now().strftime('%Y%m%d')}.log"
+    file_handler = logging.FileHandler(log_file, encoding='utf-8')
+    file_handler.setLevel(logging.DEBUG)
+    file_format = logging.Formatter(
+        '%(asctime)s | %(levelname)-8s | %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    file_handler.setFormatter(file_format)
+    
+    # Console handler - info and above
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_format = logging.Formatter('%(message)s')
+    console_handler.setFormatter(console_format)
+    
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+    
+    return logger
+
+# =============================================================================
+# CHECKPOINT/RESUME FUNCTIONALITY
+# =============================================================================
+CHECKPOINT_FILE = BASE_DIR / ".pipeline_checkpoint.json"
+
+def load_checkpoint() -> dict:
+    """Load checkpoint data for resume functionality."""
+    if CHECKPOINT_FILE.exists():
+        try:
+            import json
+            with open(CHECKPOINT_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_checkpoint(agent_name: str, completed_items: list, failed_items: list = None):
+    """Save checkpoint data for an agent."""
+    import json
+    checkpoint = load_checkpoint()
+    checkpoint[agent_name] = {
+        "completed": completed_items,
+        "failed": failed_items or [],
+        "last_updated": datetime.now().isoformat()
+    }
+    with open(CHECKPOINT_FILE, 'w') as f:
+        json.dump(checkpoint, f, indent=2)
+
+def get_completed_items(agent_name: str) -> list:
+    """Get list of completed items for an agent."""
+    checkpoint = load_checkpoint()
+    return checkpoint.get(agent_name, {}).get("completed", [])
+
+def clear_checkpoint(agent_name: str = None):
+    """Clear checkpoint for an agent or all agents."""
+    import json
+    if agent_name:
+        checkpoint = load_checkpoint()
+        if agent_name in checkpoint:
+            del checkpoint[agent_name]
+            with open(CHECKPOINT_FILE, 'w') as f:
+                json.dump(checkpoint, f, indent=2)
+    else:
+        if CHECKPOINT_FILE.exists():
+            CHECKPOINT_FILE.unlink()
 
 # =============================================================================
 # API KEYS

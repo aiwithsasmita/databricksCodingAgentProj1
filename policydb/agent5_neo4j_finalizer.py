@@ -7,6 +7,7 @@ Combines denial rules and fraud tactics, ensures ontology compliance, fills gaps
 Usage:
     python agent5_neo4j_finalizer.py                    # Process all
     python agent5_neo4j_finalizer.py <policy_id>        # Process single
+    python agent5_neo4j_finalizer.py --reset            # Clear checkpoint and reprocess all
 
 Input:  
     - Raw policy text from data/
@@ -30,8 +31,16 @@ from config import (
     DATA_DIR, OUTPUT_METADATA_DIR, OUTPUT_DENIAL_VAL_DIR, 
     OUTPUT_FRAUD_VAL_DIR, OUTPUT_NEO4J_DIR,
     ANTHROPIC_API_KEY, LLM_MODEL, LLM_MAX_TOKENS_FINALIZER, 
-    BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR
+    BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR,
+    setup_logger, save_checkpoint, get_completed_items, clear_checkpoint
 )
+
+# Setup logger
+logger = setup_logger("agent5")
+
+# Retry settings
+MAX_RETRIES = 3
+RETRY_DELAY = 5
 
 
 # Complete Neo4j Ontology Schema
@@ -166,8 +175,8 @@ def load_attachment_metadata(policy_id: str) -> list:
         try:
             with open(meta_file, 'r', encoding='utf-8') as f:
                 attachments.append(json.load(f))
-        except:
-            pass
+        except Exception as e:
+            logger.warning(f"Could not load {meta_file.name}: {e}")
     return attachments
 
 
@@ -212,7 +221,6 @@ def create_finalizer_prompt(policy_id: str, policy_text: str, denial_rules: dict
                            fraud_tactics: dict, attachments: list) -> str:
     """Create prompt for final Neo4j-ready JSON generation."""
     
-    # Attachment summary
     att_summary = ""
     for i, att in enumerate(attachments):
         llm = att.get("llm_analysis", {})
@@ -341,153 +349,204 @@ Return COMPLETE Neo4j-ready JSON:
 
 
 def finalize_for_neo4j(policy_id: str) -> dict:
-    """Create final Neo4j-ready JSON for a policy."""
+    """Create final Neo4j-ready JSON for a policy with retry logic."""
     
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
-    
-    print(f"\n{'='*60}")
-    print(f"Finalizing: {policy_id}")
-    print(f"{'='*60}")
+    logger.info(f"\n{'='*60}")
+    logger.info(f"Finalizing: {policy_id}")
+    logger.info(f"{'='*60}")
     
     # Load all inputs
     policy_text = load_policy_text(policy_id)
-    print(f"  Policy text: {len(policy_text):,} chars")
+    logger.info(f"Policy text: {len(policy_text):,} chars")
     
     denial_rules = load_validated_denial_rules(policy_id)
     num_rules = len(denial_rules.get("denial_rules", []))
-    print(f"  Denial rules: {num_rules}")
+    logger.info(f"Denial rules: {num_rules}")
     
     fraud_tactics = load_validated_fraud_tactics(policy_id)
     num_tactics = len(fraud_tactics.get("fraud_tactics", []))
-    print(f"  Fraud tactics: {num_tactics}")
+    logger.info(f"Fraud tactics: {num_tactics}")
     
     attachments = load_attachment_metadata(policy_id)
-    print(f"  Attachments: {len(attachments)}")
+    logger.info(f"Attachments: {len(attachments)}")
     
     if not policy_text:
-        print(f"  ✗ Policy text not found")
+        logger.error("Policy text not found")
         return {"error": "Policy text not found", "policy_id": policy_id}
     
     if not denial_rules.get("denial_rules") and not fraud_tactics.get("fraud_tactics"):
-        print(f"  ✗ No rules or tactics to finalize")
+        logger.error("No rules or tactics to finalize")
         return {"error": "No data to finalize", "policy_id": policy_id}
     
     # Create prompt
     prompt = create_finalizer_prompt(policy_id, policy_text, denial_rules, fraud_tactics, attachments)
-    print(f"  Prompt: {len(prompt):,} chars")
+    logger.debug(f"Prompt: {len(prompt):,} chars")
     
-    # Call LLM
-    print(f"  Calling {LLM_MODEL}...")
-    try:
-        response = client.messages.create(
-            model=LLM_MODEL,
-            max_tokens=LLM_MAX_TOKENS_FINALIZER,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        response_text = response.content[0].text
-        print(f"  Response: {len(response_text):,} chars")
-        
-        # Extract JSON
-        json_match = re.search(r'\{[\s\S]*\}', response_text)
-        if json_match:
-            result = json.loads(json_match.group())
-        else:
-            result = json.loads(response_text)
-        
-        summary = result.get("summary", {})
-        print(f"  ✓ Denial rules: {summary.get('total_denial_rules', '?')}")
-        print(f"  ✓ Fraud tactics: {summary.get('total_fraud_tactics', '?')}")
-        print(f"  ✓ Codes: {summary.get('total_codes', '?')}")
-        print(f"  ✓ Relationships: {summary.get('total_relationships', '?')}")
-        
-        # Save output
-        output_file = OUTPUT_NEO4J_DIR / f"{policy_id}_neo4j.json"
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(result, f, indent=2)
-        print(f"  ✓ Saved: {output_file.name}")
-        
-        return result
-        
-    except json.JSONDecodeError as e:
-        print(f"  ✗ JSON Parse Error: {e}")
-        if SAVE_DEBUG_ON_ERROR:
-            debug_file = OUTPUT_NEO4J_DIR / f"{policy_id}_debug.txt"
-            with open(debug_file, 'w', encoding='utf-8') as f:
-                f.write(response_text)
-        return {"error": str(e), "policy_id": policy_id}
-        
-    except Exception as e:
-        print(f"  ✗ Error: {e}")
-        return {"error": str(e), "policy_id": policy_id}
+    # Initialize client
+    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    
+    # Call LLM with retry
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            logger.info(f"Calling {LLM_MODEL} (attempt {attempt}/{MAX_RETRIES})...")
+            
+            response = client.messages.create(
+                model=LLM_MODEL,
+                max_tokens=LLM_MAX_TOKENS_FINALIZER,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            response_text = response.content[0].text
+            logger.debug(f"Response: {len(response_text):,} chars")
+            
+            # Extract JSON
+            json_match = re.search(r'\{[\s\S]*\}', response_text)
+            if json_match:
+                result = json.loads(json_match.group())
+            else:
+                result = json.loads(response_text)
+            
+            summary = result.get("summary", {})
+            logger.info(f"✓ Denial rules: {summary.get('total_denial_rules', '?')}")
+            logger.info(f"✓ Fraud tactics: {summary.get('total_fraud_tactics', '?')}")
+            logger.info(f"✓ Codes: {summary.get('total_codes', '?')}")
+            logger.info(f"✓ Relationships: {summary.get('total_relationships', '?')}")
+            
+            # Save output
+            output_file = OUTPUT_NEO4J_DIR / f"{policy_id}_neo4j.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2)
+            logger.info(f"✓ Saved: {output_file.name}")
+            
+            return result
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON Parse Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                if SAVE_DEBUG_ON_ERROR:
+                    debug_file = OUTPUT_NEO4J_DIR / f"{policy_id}_debug.txt"
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(response_text)
+                return {"error": str(e), "policy_id": policy_id}
+            time.sleep(RETRY_DELAY)
+            
+        except Exception as e:
+            logger.error(f"Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                return {"error": str(e), "policy_id": policy_id}
+            logger.info(f"Retrying in {RETRY_DELAY}s...")
+            time.sleep(RETRY_DELAY)
+    
+    return {"error": "Max retries exceeded", "policy_id": policy_id}
 
 
-def process_all():
-    """Process all policies with validated data."""
-    # Find policies that have both validated denial and fraud
+def process_all(reset: bool = False):
+    """Process all policies with validated data and checkpoint/resume."""
+    
+    if reset:
+        logger.info("Clearing checkpoint - will reprocess all files")
+        clear_checkpoint("agent5")
+    
+    completed = get_completed_items("agent5")
+    if completed:
+        logger.info(f"Resuming from checkpoint - {len(completed)} files already processed")
+    
+    # Find policies that have validated denial or fraud
     denial_files = {f.stem.replace("_denial_validated", "") for f in OUTPUT_DENIAL_VAL_DIR.glob("*_denial_validated.json")}
     fraud_files = {f.stem.replace("_fraud_validated", "") for f in OUTPUT_FRAUD_VAL_DIR.glob("*_fraud_validated.json")}
     
-    # Process policies that have at least denial rules
-    policy_ids = denial_files | fraud_files
+    all_policy_ids = sorted(denial_files | fraud_files)
     
-    if not policy_ids:
-        print("No validated files found.")
-        print("Run Agents 2-4 first.")
+    if not all_policy_ids:
+        logger.warning("No validated files found.")
+        logger.info("Run Agents 2-4 first.")
         return []
     
-    print(f"Found {len(policy_ids)} policies to finalize")
+    # Filter completed
+    pending_ids = [pid for pid in all_policy_ids if pid not in completed]
+    
+    logger.info("=" * 60)
+    logger.info("AGENT 5: Neo4j Finalizer")
+    logger.info("=" * 60)
+    logger.info(f"Total policies: {len(all_policy_ids)}")
+    logger.info(f"Already completed: {len(completed)}")
+    logger.info(f"Pending: {len(pending_ids)}")
+    logger.info("=" * 60)
+    
+    if not pending_ids:
+        logger.info("All files already processed. Use --reset to reprocess.")
+        return []
     
     results = []
-    for i, policy_id in enumerate(sorted(policy_ids)):
+    failed = []
+    
+    for i, policy_id in enumerate(pending_ids):
+        logger.info(f"\n[{i+1}/{len(pending_ids)}] Finalizing: {policy_id}")
+        
         result = finalize_for_neo4j(policy_id)
         
-        summary = result.get("summary", {})
-        results.append({
-            "policy_id": policy_id,
-            "rules": summary.get("total_denial_rules", 0),
-            "tactics": summary.get("total_fraud_tactics", 0),
-            "relationships": summary.get("total_relationships", 0),
-            "status": "success" if "nodes" in result else "error"
-        })
+        if "nodes" in result:
+            completed.append(policy_id)
+            summary = result.get("summary", {})
+            results.append({
+                "policy_id": policy_id,
+                "rules": summary.get("total_denial_rules", 0),
+                "tactics": summary.get("total_fraud_tactics", 0),
+                "relationships": summary.get("total_relationships", 0),
+                "status": "success"
+            })
+            save_checkpoint("agent5", completed, failed)
+        else:
+            failed.append(policy_id)
+            results.append({
+                "policy_id": policy_id,
+                "status": "error",
+                "error": result.get("error", "Unknown error")
+            })
+            logger.error(f"✗ Failed: {policy_id}")
+            save_checkpoint("agent5", completed, failed)
         
-        if i < len(policy_ids) - 1:
-            print(f"  Waiting {BATCH_DELAY_SECONDS}s...")
+        if i < len(pending_ids) - 1:
+            logger.debug(f"Waiting {BATCH_DELAY_SECONDS}s...")
             time.sleep(BATCH_DELAY_SECONDS)
     
     # Summary
-    print("\n" + "=" * 60)
-    print("AGENT 5 COMPLETE: Neo4j Finalizer")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("AGENT 5 COMPLETE: Neo4j Finalizer")
+    logger.info("=" * 60)
     successful = sum(1 for r in results if r['status'] == 'success')
-    total_rules = sum(r.get('rules', 0) for r in results)
-    total_tactics = sum(r.get('tactics', 0) for r in results)
-    total_rels = sum(r.get('relationships', 0) for r in results)
-    print(f"Policies finalized: {len(results)}")
-    print(f"Successful: {successful}")
-    print(f"Total denial rules: {total_rules}")
-    print(f"Total fraud tactics: {total_tactics}")
-    print(f"Total relationships: {total_rels}")
-    print(f"Output directory: {OUTPUT_NEO4J_DIR}")
-    print("\nNext step: python neo4j_loader.py")
+    total_rules = sum(r.get('rules', 0) for r in results if r['status'] == 'success')
+    total_tactics = sum(r.get('tactics', 0) for r in results if r['status'] == 'success')
+    total_rels = sum(r.get('relationships', 0) for r in results if r['status'] == 'success')
+    logger.info(f"Processed this run: {len(results)}")
+    logger.info(f"Successful: {successful}")
+    logger.info(f"Failed: {len(failed)}")
+    logger.info(f"Total denial rules: {total_rules}")
+    logger.info(f"Total fraud tactics: {total_tactics}")
+    logger.info(f"Total relationships: {total_rels}")
+    logger.info(f"Output directory: {OUTPUT_NEO4J_DIR}")
+    
+    if failed:
+        logger.warning(f"Failed policies: {failed}")
+        logger.info("Run again to retry failed policies, or use --reset to start fresh")
+    else:
+        logger.info("\nNext step: Load to Neo4j")
     
     return results
 
 
 def main():
     """Main entry point."""
-    print("=" * 60)
-    print("AGENT 5: Neo4j Finalizer")
-    print("=" * 60)
-    
     if not ANTHROPIC_API_KEY:
-        print("ERROR: ANTHROPIC_API_KEY not set in .env file")
+        logger.error("ANTHROPIC_API_KEY not set in .env file")
         sys.exit(1)
     
-    if len(sys.argv) > 1:
+    reset = "--reset" in sys.argv
+    
+    if len(sys.argv) > 1 and sys.argv[1] != "--reset":
         finalize_for_neo4j(sys.argv[1])
     else:
-        process_all()
+        process_all(reset=reset)
 
 
 if __name__ == "__main__":

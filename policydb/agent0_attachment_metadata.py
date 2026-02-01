@@ -6,6 +6,7 @@ Generates LLM-based metadata for attachment files (Excel/CSV).
 Usage:
     python agent0_attachment_metadata.py                    # Process all attachments
     python agent0_attachment_metadata.py <attachment_file>  # Process single file
+    python agent0_attachment_metadata.py --reset            # Clear checkpoint and reprocess all
 
 Input:  Attachment files in input/ directory
 Output: JSON metadata files in output_metadata/ directory
@@ -14,6 +15,7 @@ Output: JSON metadata files in output_metadata/ directory
 import sys
 import json
 import time
+import re
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
@@ -21,8 +23,16 @@ from anthropic import Anthropic
 
 from config import (
     INPUT_DIR, OUTPUT_METADATA_DIR, ANTHROPIC_API_KEY,
-    LLM_MODEL, BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR
+    LLM_MODEL, BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR,
+    setup_logger, save_checkpoint, get_completed_items, clear_checkpoint
 )
+
+# Setup logger
+logger = setup_logger("agent0")
+
+# Retry settings
+MAX_RETRIES = 3
+RETRY_DELAY = 5
 
 
 def read_attachment_preview(file_path: Path, num_rows: int = 5) -> tuple:
@@ -77,77 +87,97 @@ Return ONLY the JSON object, no other text.
 
 
 def generate_metadata(file_path: Path) -> dict:
-    """Generate metadata for a single attachment file."""
-    print(f"\nProcessing: {file_path.name}")
+    """Generate metadata for a single attachment file with retry logic."""
+    logger.info(f"Processing: {file_path.name}")
     
     # Read preview
     columns, preview, error = read_attachment_preview(file_path)
     if error:
-        print(f"  ✗ Error reading file: {error}")
+        logger.error(f"Error reading file {file_path.name}: {error}")
         return {"error": error, "filename": file_path.name}
     
-    print(f"  Columns: {columns}")
-    print(f"  Preview rows: {len(preview)}")
+    logger.debug(f"Columns: {columns}")
+    logger.debug(f"Preview rows: {len(preview)}")
     
     # Create prompt
     prompt = create_metadata_prompt(file_path.name, columns, preview)
     
-    # Call LLM
-    print(f"  Calling {LLM_MODEL}...")
+    # Call LLM with retry
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
     
-    try:
-        response = client.messages.create(
-            model=LLM_MODEL,
-            max_tokens=4000,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        response_text = response.content[0].text
-        
-        # Parse JSON
-        import re
-        json_match = re.search(r'\{[\s\S]*\}', response_text)
-        if json_match:
-            llm_analysis = json.loads(json_match.group())
-        else:
-            llm_analysis = json.loads(response_text)
-        
-        # Build full metadata
-        metadata = {
-            "attachment_filename": file_path.name,
-            "attachment_path": str(file_path.relative_to(file_path.parent.parent)),
-            "columns": columns,
-            "sample_data": preview,
-            "llm_analysis": llm_analysis,
-            "created_date": datetime.now().isoformat(),
-            "generated_at": datetime.now().isoformat()
-        }
-        
-        # Save output
-        output_file = OUTPUT_METADATA_DIR / f"{file_path.stem}_metadata.json"
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(metadata, f, indent=2, default=str)
-        
-        print(f"  ✓ Saved: {output_file.name}")
-        return metadata
-        
-    except json.JSONDecodeError as e:
-        print(f"  ✗ JSON Parse Error: {e}")
-        if SAVE_DEBUG_ON_ERROR:
-            debug_file = OUTPUT_METADATA_DIR / f"{file_path.stem}_debug.txt"
-            with open(debug_file, 'w', encoding='utf-8') as f:
-                f.write(response_text)
-            print(f"  Saved debug to: {debug_file.name}")
-        return {"error": str(e), "filename": file_path.name}
-        
-    except Exception as e:
-        print(f"  ✗ Error: {e}")
-        return {"error": str(e), "filename": file_path.name}
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            logger.info(f"Calling {LLM_MODEL} (attempt {attempt}/{MAX_RETRIES})...")
+            
+            response = client.messages.create(
+                model=LLM_MODEL,
+                max_tokens=4000,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            response_text = response.content[0].text
+            logger.debug(f"Response length: {len(response_text)} chars")
+            
+            # Parse JSON
+            json_match = re.search(r'\{[\s\S]*\}', response_text)
+            if json_match:
+                llm_analysis = json.loads(json_match.group())
+            else:
+                llm_analysis = json.loads(response_text)
+            
+            # Build full metadata
+            metadata = {
+                "attachment_filename": file_path.name,
+                "attachment_path": str(file_path.relative_to(file_path.parent.parent)),
+                "columns": columns,
+                "sample_data": preview,
+                "llm_analysis": llm_analysis,
+                "created_date": datetime.now().isoformat(),
+                "generated_at": datetime.now().isoformat()
+            }
+            
+            # Save output
+            output_file = OUTPUT_METADATA_DIR / f"{file_path.stem}_metadata.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(metadata, f, indent=2, default=str)
+            
+            logger.info(f"✓ Saved: {output_file.name}")
+            return metadata
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON Parse Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                if SAVE_DEBUG_ON_ERROR:
+                    debug_file = OUTPUT_METADATA_DIR / f"{file_path.stem}_debug.txt"
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(response_text)
+                    logger.debug(f"Saved debug to: {debug_file.name}")
+                return {"error": str(e), "filename": file_path.name}
+            time.sleep(RETRY_DELAY)
+            
+        except Exception as e:
+            logger.error(f"Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                return {"error": str(e), "filename": file_path.name}
+            logger.info(f"Retrying in {RETRY_DELAY}s...")
+            time.sleep(RETRY_DELAY)
+    
+    return {"error": "Max retries exceeded", "filename": file_path.name}
 
 
-def process_all_attachments():
-    """Process all attachment files in input directory."""
+def process_all_attachments(reset: bool = False):
+    """Process all attachment files in input directory with checkpoint/resume."""
+    
+    # Handle reset
+    if reset:
+        logger.info("Clearing checkpoint - will reprocess all files")
+        clear_checkpoint("agent0")
+    
+    # Get completed items
+    completed = get_completed_items("agent0")
+    if completed:
+        logger.info(f"Resuming from checkpoint - {len(completed)} files already processed")
+    
     # Find all attachment files
     extensions = ['*.xlsx', '*.xls', '*.csv']
     files = []
@@ -155,47 +185,84 @@ def process_all_attachments():
         files.extend(INPUT_DIR.glob(ext))
     
     if not files:
-        print(f"No attachment files found in {INPUT_DIR}")
+        logger.warning(f"No attachment files found in {INPUT_DIR}")
         return []
     
-    print(f"Found {len(files)} attachment files")
-    print("=" * 60)
+    # Filter out already completed files
+    pending_files = [f for f in files if f.name not in completed]
+    
+    logger.info("=" * 60)
+    logger.info("AGENT 0: Attachment Metadata Generator")
+    logger.info("=" * 60)
+    logger.info(f"Total files: {len(files)}")
+    logger.info(f"Already completed: {len(completed)}")
+    logger.info(f"Pending: {len(pending_files)}")
+    logger.info("=" * 60)
+    
+    if not pending_files:
+        logger.info("All files already processed. Use --reset to reprocess.")
+        return []
     
     results = []
-    for i, file_path in enumerate(files):
+    failed = []
+    
+    for i, file_path in enumerate(pending_files):
+        logger.info(f"\n[{i+1}/{len(pending_files)}] Processing: {file_path.name}")
+        
         result = generate_metadata(file_path)
-        results.append({
-            "file": file_path.name,
-            "status": "success" if "llm_analysis" in result else "error"
-        })
+        
+        if "llm_analysis" in result:
+            completed.append(file_path.name)
+            results.append({
+                "file": file_path.name,
+                "status": "success"
+            })
+            # Save checkpoint after each success
+            save_checkpoint("agent0", completed, failed)
+        else:
+            failed.append(file_path.name)
+            results.append({
+                "file": file_path.name,
+                "status": "error",
+                "error": result.get("error", "Unknown error")
+            })
+            logger.error(f"✗ Failed: {file_path.name}")
+            # Save checkpoint with failed items
+            save_checkpoint("agent0", completed, failed)
         
         # Delay between calls
-        if i < len(files) - 1:
+        if i < len(pending_files) - 1:
+            logger.debug(f"Waiting {BATCH_DELAY_SECONDS}s before next file...")
             time.sleep(BATCH_DELAY_SECONDS)
     
-    # Summary
-    print("\n" + "=" * 60)
-    print("AGENT 0 COMPLETE: Attachment Metadata Generator")
-    print("=" * 60)
+    # Final summary
+    logger.info("\n" + "=" * 60)
+    logger.info("AGENT 0 COMPLETE: Attachment Metadata Generator")
+    logger.info("=" * 60)
     successful = sum(1 for r in results if r['status'] == 'success')
-    print(f"Processed: {len(results)}")
-    print(f"Successful: {successful}")
-    print(f"Output directory: {OUTPUT_METADATA_DIR}")
+    logger.info(f"Processed this run: {len(results)}")
+    logger.info(f"Successful: {successful}")
+    logger.info(f"Failed: {len(failed)}")
+    logger.info(f"Total completed: {len(completed)}")
+    logger.info(f"Output directory: {OUTPUT_METADATA_DIR}")
+    
+    if failed:
+        logger.warning(f"Failed files: {failed}")
+        logger.info("Run again to retry failed files, or use --reset to start fresh")
     
     return results
 
 
 def main():
     """Main entry point."""
-    print("=" * 60)
-    print("AGENT 0: Attachment Metadata Generator")
-    print("=" * 60)
-    
     if not ANTHROPIC_API_KEY:
-        print("ERROR: ANTHROPIC_API_KEY not set in .env file")
+        logger.error("ANTHROPIC_API_KEY not set in .env file")
         sys.exit(1)
     
-    if len(sys.argv) > 1:
+    # Check for reset flag
+    reset = "--reset" in sys.argv
+    
+    if len(sys.argv) > 1 and sys.argv[1] != "--reset":
         # Process single file
         file_path = Path(sys.argv[1])
         if not file_path.exists():
@@ -204,11 +271,11 @@ def main():
         if file_path.exists():
             generate_metadata(file_path)
         else:
-            print(f"File not found: {sys.argv[1]}")
+            logger.error(f"File not found: {sys.argv[1]}")
             sys.exit(1)
     else:
         # Process all files
-        process_all_attachments()
+        process_all_attachments(reset=reset)
 
 
 if __name__ == "__main__":

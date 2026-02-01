@@ -6,6 +6,7 @@ Validates, enhances, and adds missing fraud tactics.
 Usage:
     python agent4_fraud_validator.py                    # Process all
     python agent4_fraud_validator.py <policy_id>        # Process single
+    python agent4_fraud_validator.py --reset            # Clear checkpoint and reprocess all
 
 Input:  
     - Raw fraud tactics from fraud_tactics_output/
@@ -29,8 +30,16 @@ from config import (
     DATA_DIR, OUTPUT_METADATA_DIR, OUTPUT_DENIAL_VAL_DIR, 
     OUTPUT_FRAUD_DIR, OUTPUT_FRAUD_VAL_DIR,
     ANTHROPIC_API_KEY, LLM_MODEL, LLM_MAX_TOKENS_VALIDATOR, 
-    BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR
+    BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR,
+    setup_logger, save_checkpoint, get_completed_items, clear_checkpoint
 )
+
+# Setup logger
+logger = setup_logger("agent4")
+
+# Retry settings
+MAX_RETRIES = 3
+RETRY_DELAY = 5
 
 
 # Neo4j Ontology Schema for fraud tactics
@@ -122,8 +131,8 @@ def load_attachment_metadata(policy_id: str) -> list:
         try:
             with open(meta_file, 'r', encoding='utf-8') as f:
                 attachments.append(json.load(f))
-        except:
-            pass
+        except Exception as e:
+            logger.warning(f"Could not load {meta_file.name}: {e}")
     return attachments
 
 
@@ -159,13 +168,11 @@ def create_validation_prompt(policy_id: str, policy_text: str, denial_rules: dic
                             fraud_tactics: dict, attachments: list) -> str:
     """Create prompt for fraud tactics validation."""
     
-    # Attachment summary
     att_summary = ""
     for att in attachments:
         llm = att.get("llm_analysis", {})
         att_summary += f"- {att.get('attachment_filename', '?')}: {llm.get('objective', 'N/A')}\n"
     
-    # Denial rules summary
     rules_summary = ""
     for rule in denial_rules.get("denial_rules", [])[:15]:
         rules_summary += f"- {rule.get('rule_id', '?')}: {rule.get('rule_name', '?')}\n"
@@ -234,146 +241,197 @@ Return JSON:
 
 
 def validate_fraud_tactics(policy_id: str) -> dict:
-    """Validate fraud tactics for a single policy."""
+    """Validate fraud tactics for a single policy with retry logic."""
     
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
-    
-    print(f"\n{'='*60}")
-    print(f"Validating: {policy_id}")
-    print(f"{'='*60}")
+    logger.info(f"\n{'='*60}")
+    logger.info(f"Validating: {policy_id}")
+    logger.info(f"{'='*60}")
     
     # Load inputs
     policy_text = load_policy_text(policy_id)
-    print(f"  Policy text: {len(policy_text):,} chars")
+    logger.info(f"Policy text: {len(policy_text):,} chars")
     
     denial_rules = load_validated_denial_rules(policy_id)
-    print(f"  Denial rules: {len(denial_rules.get('denial_rules', []))}")
+    logger.info(f"Denial rules: {len(denial_rules.get('denial_rules', []))}")
     
     fraud_tactics = load_fraud_tactics(policy_id)
     num_tactics = len(fraud_tactics.get("fraud_tactics", []))
-    print(f"  Existing tactics: {num_tactics}")
+    logger.info(f"Existing tactics: {num_tactics}")
     
     attachments = load_attachment_metadata(policy_id)
-    print(f"  Attachments: {len(attachments)}")
+    logger.info(f"Attachments: {len(attachments)}")
     
     if not policy_text:
-        print(f"  ✗ Policy text not found")
+        logger.error("Policy text not found")
         return {"error": "Policy text not found", "policy_id": policy_id}
     
     if not fraud_tactics.get("fraud_tactics"):
-        print(f"  ✗ No fraud tactics to validate")
+        logger.error("No fraud tactics to validate")
         return {"error": "No fraud tactics found", "policy_id": policy_id}
     
     # Create prompt
     prompt = create_validation_prompt(policy_id, policy_text, denial_rules, fraud_tactics, attachments)
-    print(f"  Prompt: {len(prompt):,} chars")
+    logger.debug(f"Prompt: {len(prompt):,} chars")
     
-    # Call LLM
-    print(f"  Calling {LLM_MODEL}...")
-    try:
-        response = client.messages.create(
-            model=LLM_MODEL,
-            max_tokens=LLM_MAX_TOKENS_VALIDATOR,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        response_text = response.content[0].text
-        print(f"  Response: {len(response_text):,} chars")
-        
-        # Extract JSON
-        json_match = re.search(r'\{[\s\S]*\}', response_text)
-        if json_match:
-            result = json.loads(json_match.group())
-        else:
-            result = json.loads(response_text)
-        
-        summary = result.get("summary", {})
-        print(f"  ✓ Original: {summary.get('original_tactics', 0)}")
-        print(f"  ✓ Enhanced: {summary.get('enhanced_tactics', 0)}")
-        print(f"  ✓ New: {summary.get('new_tactics_added', 0)}")
-        print(f"  ✓ Total: {summary.get('total_tactics', len(result.get('fraud_tactics', [])))}")
-        
-        # Save output
-        output_file = OUTPUT_FRAUD_VAL_DIR / f"{policy_id}_fraud_validated.json"
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(result, f, indent=2)
-        print(f"  ✓ Saved: {output_file.name}")
-        
-        return result
-        
-    except json.JSONDecodeError as e:
-        print(f"  ✗ JSON Parse Error: {e}")
-        if SAVE_DEBUG_ON_ERROR:
-            debug_file = OUTPUT_FRAUD_VAL_DIR / f"{policy_id}_debug.txt"
-            with open(debug_file, 'w', encoding='utf-8') as f:
-                f.write(response_text)
-        return {"error": str(e), "policy_id": policy_id}
-        
-    except Exception as e:
-        print(f"  ✗ Error: {e}")
-        return {"error": str(e), "policy_id": policy_id}
+    # Initialize client
+    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    
+    # Call LLM with retry
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            logger.info(f"Calling {LLM_MODEL} (attempt {attempt}/{MAX_RETRIES})...")
+            
+            response = client.messages.create(
+                model=LLM_MODEL,
+                max_tokens=LLM_MAX_TOKENS_VALIDATOR,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            response_text = response.content[0].text
+            logger.debug(f"Response: {len(response_text):,} chars")
+            
+            # Extract JSON
+            json_match = re.search(r'\{[\s\S]*\}', response_text)
+            if json_match:
+                result = json.loads(json_match.group())
+            else:
+                result = json.loads(response_text)
+            
+            summary = result.get("summary", {})
+            logger.info(f"✓ Original: {summary.get('original_tactics', 0)}")
+            logger.info(f"✓ Enhanced: {summary.get('enhanced_tactics', 0)}")
+            logger.info(f"✓ New: {summary.get('new_tactics_added', 0)}")
+            logger.info(f"✓ Total: {summary.get('total_tactics', len(result.get('fraud_tactics', [])))}")
+            
+            # Save output
+            output_file = OUTPUT_FRAUD_VAL_DIR / f"{policy_id}_fraud_validated.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2)
+            logger.info(f"✓ Saved: {output_file.name}")
+            
+            return result
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON Parse Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                if SAVE_DEBUG_ON_ERROR:
+                    debug_file = OUTPUT_FRAUD_VAL_DIR / f"{policy_id}_debug.txt"
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(response_text)
+                return {"error": str(e), "policy_id": policy_id}
+            time.sleep(RETRY_DELAY)
+            
+        except Exception as e:
+            logger.error(f"Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                return {"error": str(e), "policy_id": policy_id}
+            logger.info(f"Retrying in {RETRY_DELAY}s...")
+            time.sleep(RETRY_DELAY)
+    
+    return {"error": "Max retries exceeded", "policy_id": policy_id}
 
 
-def process_all():
-    """Process all fraud tactics files."""
+def process_all(reset: bool = False):
+    """Process all fraud tactics files with checkpoint/resume."""
+    
+    if reset:
+        logger.info("Clearing checkpoint - will reprocess all files")
+        clear_checkpoint("agent4")
+    
+    completed = get_completed_items("agent4")
+    if completed:
+        logger.info(f"Resuming from checkpoint - {len(completed)} files already processed")
+    
     tactics_files = list(OUTPUT_FRAUD_DIR.glob("*_fraud_tactics.json"))
     
     if not tactics_files:
-        print(f"No fraud tactics files found in {OUTPUT_FRAUD_DIR}")
-        print("Run Agent 3 first: python agent3_fraud_generator.py")
+        logger.warning(f"No fraud tactics files found in {OUTPUT_FRAUD_DIR}")
+        logger.info("Run Agent 3 first: python agent3_fraud_generator.py")
         return []
     
-    print(f"Found {len(tactics_files)} fraud tactics files to validate")
+    # Extract policy IDs and filter completed
+    all_policy_ids = [f.stem.replace("_fraud_tactics", "") for f in tactics_files]
+    pending_ids = [pid for pid in all_policy_ids if pid not in completed]
+    
+    logger.info("=" * 60)
+    logger.info("AGENT 4: Fraud Tactics Validator")
+    logger.info("=" * 60)
+    logger.info(f"Total policies: {len(all_policy_ids)}")
+    logger.info(f"Already completed: {len(completed)}")
+    logger.info(f"Pending: {len(pending_ids)}")
+    logger.info("=" * 60)
+    
+    if not pending_ids:
+        logger.info("All files already processed. Use --reset to reprocess.")
+        return []
     
     results = []
-    for i, tactics_file in enumerate(tactics_files):
-        policy_id = tactics_file.stem.replace("_fraud_tactics", "")
+    failed = []
+    
+    for i, policy_id in enumerate(pending_ids):
+        logger.info(f"\n[{i+1}/{len(pending_ids)}] Validating: {policy_id}")
+        
         result = validate_fraud_tactics(policy_id)
         
-        summary = result.get("summary", {})
-        results.append({
-            "policy_id": policy_id,
-            "original": summary.get("original_tactics", 0),
-            "enhanced": summary.get("enhanced_tactics", 0),
-            "new": summary.get("new_tactics_added", 0),
-            "total": summary.get("total_tactics", 0),
-            "status": "success" if "fraud_tactics" in result else "error"
-        })
+        if "fraud_tactics" in result:
+            completed.append(policy_id)
+            summary = result.get("summary", {})
+            results.append({
+                "policy_id": policy_id,
+                "original": summary.get("original_tactics", 0),
+                "enhanced": summary.get("enhanced_tactics", 0),
+                "new": summary.get("new_tactics_added", 0),
+                "total": summary.get("total_tactics", 0),
+                "status": "success"
+            })
+            save_checkpoint("agent4", completed, failed)
+        else:
+            failed.append(policy_id)
+            results.append({
+                "policy_id": policy_id,
+                "status": "error",
+                "error": result.get("error", "Unknown error")
+            })
+            logger.error(f"✗ Failed: {policy_id}")
+            save_checkpoint("agent4", completed, failed)
         
-        if i < len(tactics_files) - 1:
-            print(f"  Waiting {BATCH_DELAY_SECONDS}s...")
+        if i < len(pending_ids) - 1:
+            logger.debug(f"Waiting {BATCH_DELAY_SECONDS}s...")
             time.sleep(BATCH_DELAY_SECONDS)
     
     # Summary
-    print("\n" + "=" * 60)
-    print("AGENT 4 COMPLETE: Fraud Tactics Validator")
-    print("=" * 60)
+    logger.info("\n" + "=" * 60)
+    logger.info("AGENT 4 COMPLETE: Fraud Tactics Validator")
+    logger.info("=" * 60)
     successful = sum(1 for r in results if r['status'] == 'success')
-    total_tactics = sum(r.get('total', 0) for r in results)
-    total_new = sum(r.get('new', 0) for r in results)
-    print(f"Policies validated: {len(results)}")
-    print(f"Successful: {successful}")
-    print(f"Total tactics: {total_tactics}")
-    print(f"New tactics added: {total_new}")
-    print(f"Output directory: {OUTPUT_FRAUD_VAL_DIR}")
+    total_tactics = sum(r.get('total', 0) for r in results if r['status'] == 'success')
+    total_new = sum(r.get('new', 0) for r in results if r['status'] == 'success')
+    logger.info(f"Processed this run: {len(results)}")
+    logger.info(f"Successful: {successful}")
+    logger.info(f"Failed: {len(failed)}")
+    logger.info(f"Total tactics: {total_tactics}")
+    logger.info(f"New tactics added: {total_new}")
+    logger.info(f"Output directory: {OUTPUT_FRAUD_VAL_DIR}")
+    
+    if failed:
+        logger.warning(f"Failed policies: {failed}")
+        logger.info("Run again to retry failed policies, or use --reset to start fresh")
     
     return results
 
 
 def main():
     """Main entry point."""
-    print("=" * 60)
-    print("AGENT 4: Fraud Tactics Validator")
-    print("=" * 60)
-    
     if not ANTHROPIC_API_KEY:
-        print("ERROR: ANTHROPIC_API_KEY not set in .env file")
+        logger.error("ANTHROPIC_API_KEY not set in .env file")
         sys.exit(1)
     
-    if len(sys.argv) > 1:
+    reset = "--reset" in sys.argv
+    
+    if len(sys.argv) > 1 and sys.argv[1] != "--reset":
         validate_fraud_tactics(sys.argv[1])
     else:
-        process_all()
+        process_all(reset=reset)
 
 
 if __name__ == "__main__":

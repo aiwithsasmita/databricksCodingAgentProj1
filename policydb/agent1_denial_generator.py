@@ -6,6 +6,7 @@ Generates denial rules from healthcare policy documents.
 Usage:
     python agent1_denial_generator.py                    # Process all policies
     python agent1_denial_generator.py <policy_file>      # Process single file
+    python agent1_denial_generator.py --reset            # Clear checkpoint and reprocess all
 
 Input:  
     - Policy text files in data/ directory
@@ -25,8 +26,16 @@ from anthropic import Anthropic
 
 from config import (
     DATA_DIR, OUTPUT_METADATA_DIR, OUTPUT_DENIAL_DIR, ANTHROPIC_API_KEY,
-    LLM_MODEL, LLM_MAX_TOKENS_GENERATOR, BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR
+    LLM_MODEL, LLM_MAX_TOKENS_GENERATOR, BATCH_DELAY_SECONDS, SAVE_DEBUG_ON_ERROR,
+    setup_logger, save_checkpoint, get_completed_items, clear_checkpoint
 )
+
+# Setup logger
+logger = setup_logger("agent1")
+
+# Retry settings
+MAX_RETRIES = 3
+RETRY_DELAY = 5
 
 
 def extract_policy_id(text: str, filename: str) -> str:
@@ -81,7 +90,7 @@ def load_attachment_metadata(policy_id: str, policy_name: str) -> list:
             elif any(kw in filename_lower for kw in key_words[:2]):
                 attachments.append(meta)
         except Exception as e:
-            print(f"  Warning: Could not load {meta_file.name}: {e}")
+            logger.warning(f"Could not load {meta_file.name}: {e}")
     
     return attachments
 
@@ -183,122 +192,175 @@ Return JSON:
 
 
 def generate_denial_rules(policy_file: Path) -> dict:
-    """Generate denial rules for a single policy."""
+    """Generate denial rules for a single policy with retry logic."""
     
-    # Initialize fresh client
-    client = Anthropic(api_key=ANTHROPIC_API_KEY)
-    
-    print(f"\n{'='*60}")
-    print(f"Processing: {policy_file.name}")
-    print(f"{'='*60}")
+    logger.info(f"\n{'='*60}")
+    logger.info(f"Processing: {policy_file.name}")
+    logger.info(f"{'='*60}")
     
     # Load policy
     policy_text, policy_id, policy_name = load_policy_text(policy_file)
-    print(f"  Policy ID: {policy_id}")
-    print(f"  Policy Name: {policy_name[:50]}...")
-    print(f"  Text Length: {len(policy_text):,} chars")
+    logger.info(f"Policy ID: {policy_id}")
+    logger.info(f"Policy Name: {policy_name[:50]}...")
+    logger.debug(f"Text Length: {len(policy_text):,} chars")
     
     # Load attachments
     attachments = load_attachment_metadata(policy_id, policy_name)
-    print(f"  Attachments: {len(attachments)}")
+    logger.info(f"Attachments: {len(attachments)}")
     
     # Create prompt
     prompt = create_denial_rules_prompt(policy_text, policy_id, policy_name, attachments)
-    print(f"  Prompt Length: {len(prompt):,} chars")
+    logger.debug(f"Prompt Length: {len(prompt):,} chars")
     
-    # Call LLM
-    print(f"  Calling {LLM_MODEL}...")
-    try:
-        response = client.messages.create(
-            model=LLM_MODEL,
-            max_tokens=LLM_MAX_TOKENS_GENERATOR,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        response_text = response.content[0].text
-        print(f"  Response Length: {len(response_text):,} chars")
-        
-        # Extract JSON
-        json_match = re.search(r'\{[\s\S]*\}', response_text)
-        if json_match:
-            result = json.loads(json_match.group())
-        else:
-            result = json.loads(response_text)
-        
-        num_rules = len(result.get('denial_rules', []))
-        print(f"  ✓ Generated {num_rules} denial rules")
-        
-        # Save output
-        output_file = OUTPUT_DENIAL_DIR / f"{policy_id}_denial_rules.json"
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(result, f, indent=2)
-        print(f"  ✓ Saved: {output_file.name}")
-        
-        return result
-        
-    except json.JSONDecodeError as e:
-        print(f"  ✗ JSON Parse Error: {e}")
-        if SAVE_DEBUG_ON_ERROR:
-            debug_file = OUTPUT_DENIAL_DIR / f"{policy_id}_debug.txt"
-            with open(debug_file, 'w', encoding='utf-8') as f:
-                f.write(response_text)
-            print(f"  Saved debug: {debug_file.name}")
-        return {"error": str(e), "policy_id": policy_id}
-        
-    except Exception as e:
-        print(f"  ✗ Error: {e}")
-        return {"error": str(e), "policy_id": policy_id}
+    # Initialize client
+    client = Anthropic(api_key=ANTHROPIC_API_KEY)
+    
+    # Call LLM with retry
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            logger.info(f"Calling {LLM_MODEL} (attempt {attempt}/{MAX_RETRIES})...")
+            
+            response = client.messages.create(
+                model=LLM_MODEL,
+                max_tokens=LLM_MAX_TOKENS_GENERATOR,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            response_text = response.content[0].text
+            logger.debug(f"Response Length: {len(response_text):,} chars")
+            
+            # Extract JSON
+            json_match = re.search(r'\{[\s\S]*\}', response_text)
+            if json_match:
+                result = json.loads(json_match.group())
+            else:
+                result = json.loads(response_text)
+            
+            num_rules = len(result.get('denial_rules', []))
+            logger.info(f"✓ Generated {num_rules} denial rules")
+            
+            # Save output
+            output_file = OUTPUT_DENIAL_DIR / f"{policy_id}_denial_rules.json"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2)
+            logger.info(f"✓ Saved: {output_file.name}")
+            
+            return result
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON Parse Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                if SAVE_DEBUG_ON_ERROR:
+                    debug_file = OUTPUT_DENIAL_DIR / f"{policy_id}_debug.txt"
+                    with open(debug_file, 'w', encoding='utf-8') as f:
+                        f.write(response_text)
+                    logger.debug(f"Saved debug: {debug_file.name}")
+                return {"error": str(e), "policy_id": policy_id}
+            time.sleep(RETRY_DELAY)
+            
+        except Exception as e:
+            logger.error(f"Error (attempt {attempt}): {e}")
+            if attempt == MAX_RETRIES:
+                return {"error": str(e), "policy_id": policy_id}
+            logger.info(f"Retrying in {RETRY_DELAY}s...")
+            time.sleep(RETRY_DELAY)
+    
+    return {"error": "Max retries exceeded", "policy_id": policy_id}
 
 
-def process_all_policies():
-    """Process all policy files."""
+def process_all_policies(reset: bool = False):
+    """Process all policy files with checkpoint/resume."""
+    
+    # Handle reset
+    if reset:
+        logger.info("Clearing checkpoint - will reprocess all files")
+        clear_checkpoint("agent1")
+    
+    # Get completed items
+    completed = get_completed_items("agent1")
+    if completed:
+        logger.info(f"Resuming from checkpoint - {len(completed)} files already processed")
+    
     policy_files = list(DATA_DIR.glob("*.txt"))
     
     if not policy_files:
-        print(f"No policy files found in {DATA_DIR}")
+        logger.warning(f"No policy files found in {DATA_DIR}")
         return []
     
-    print(f"Found {len(policy_files)} policy files")
+    # Filter out completed files
+    pending_files = [f for f in policy_files if f.name not in completed]
+    
+    logger.info("=" * 60)
+    logger.info("AGENT 1: Denial Rules Generator")
+    logger.info("=" * 60)
+    logger.info(f"Total files: {len(policy_files)}")
+    logger.info(f"Already completed: {len(completed)}")
+    logger.info(f"Pending: {len(pending_files)}")
+    logger.info("=" * 60)
+    
+    if not pending_files:
+        logger.info("All files already processed. Use --reset to reprocess.")
+        return []
     
     results = []
-    for i, policy_file in enumerate(policy_files):
-        result = generate_denial_rules(policy_file)
-        results.append({
-            "file": policy_file.name,
-            "policy_id": result.get("policy_id", "unknown"),
-            "num_rules": len(result.get("denial_rules", [])),
-            "status": "success" if "denial_rules" in result else "error"
-        })
+    failed = []
+    
+    for i, policy_file in enumerate(pending_files):
+        logger.info(f"\n[{i+1}/{len(pending_files)}] Processing: {policy_file.name}")
         
-        if i < len(policy_files) - 1:
-            print(f"  Waiting {BATCH_DELAY_SECONDS}s...")
+        result = generate_denial_rules(policy_file)
+        
+        if "denial_rules" in result:
+            completed.append(policy_file.name)
+            results.append({
+                "file": policy_file.name,
+                "policy_id": result.get("policy_id", "unknown"),
+                "num_rules": len(result.get("denial_rules", [])),
+                "status": "success"
+            })
+            save_checkpoint("agent1", completed, failed)
+        else:
+            failed.append(policy_file.name)
+            results.append({
+                "file": policy_file.name,
+                "status": "error",
+                "error": result.get("error", "Unknown error")
+            })
+            logger.error(f"✗ Failed: {policy_file.name}")
+            save_checkpoint("agent1", completed, failed)
+        
+        if i < len(pending_files) - 1:
+            logger.debug(f"Waiting {BATCH_DELAY_SECONDS}s...")
             time.sleep(BATCH_DELAY_SECONDS)
     
     # Summary
-    print("\n" + "=" * 60)
-    print("AGENT 1 COMPLETE: Denial Rules Generator")
-    print("=" * 60)
-    total_rules = sum(r.get('num_rules', 0) for r in results)
+    logger.info("\n" + "=" * 60)
+    logger.info("AGENT 1 COMPLETE: Denial Rules Generator")
+    logger.info("=" * 60)
+    total_rules = sum(r.get('num_rules', 0) for r in results if r['status'] == 'success')
     successful = sum(1 for r in results if r['status'] == 'success')
-    print(f"Policies processed: {len(results)}")
-    print(f"Successful: {successful}")
-    print(f"Total denial rules: {total_rules}")
-    print(f"Output directory: {OUTPUT_DENIAL_DIR}")
+    logger.info(f"Processed this run: {len(results)}")
+    logger.info(f"Successful: {successful}")
+    logger.info(f"Failed: {len(failed)}")
+    logger.info(f"Total denial rules: {total_rules}")
+    logger.info(f"Output directory: {OUTPUT_DENIAL_DIR}")
+    
+    if failed:
+        logger.warning(f"Failed files: {failed}")
+        logger.info("Run again to retry failed files, or use --reset to start fresh")
     
     return results
 
 
 def main():
     """Main entry point."""
-    print("=" * 60)
-    print("AGENT 1: Denial Rules Generator")
-    print("=" * 60)
-    
     if not ANTHROPIC_API_KEY:
-        print("ERROR: ANTHROPIC_API_KEY not set in .env file")
+        logger.error("ANTHROPIC_API_KEY not set in .env file")
         sys.exit(1)
     
-    if len(sys.argv) > 1:
+    reset = "--reset" in sys.argv
+    
+    if len(sys.argv) > 1 and sys.argv[1] != "--reset":
         # Process single file
         file_path = Path(sys.argv[1])
         if not file_path.exists():
@@ -307,10 +369,10 @@ def main():
         if file_path.exists():
             generate_denial_rules(file_path)
         else:
-            print(f"File not found: {sys.argv[1]}")
+            logger.error(f"File not found: {sys.argv[1]}")
             sys.exit(1)
     else:
-        process_all_policies()
+        process_all_policies(reset=reset)
 
 
 if __name__ == "__main__":
