@@ -133,9 +133,9 @@ NEO4J_USER = NEO4J_USERNAME
 # LLM SETTINGS
 # =============================================================================
 LLM_MODEL = "claude-sonnet-4-20250514"
-LLM_MAX_TOKENS_GENERATOR = 16000    # For generators (denial, fraud)
-LLM_MAX_TOKENS_VALIDATOR = 20000    # For validators (more output needed)
-LLM_MAX_TOKENS_FINALIZER = 25000    # For finalizer (largest output)
+LLM_MAX_TOKENS_GENERATOR = 64000    # For generators (denial, fraud) - no limit
+LLM_MAX_TOKENS_VALIDATOR = 64000    # For validators - no limit
+LLM_MAX_TOKENS_FINALIZER = 64000    # For finalizer - no limit
 
 # =============================================================================
 # PIPELINE SETTINGS

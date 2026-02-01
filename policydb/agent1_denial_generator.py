@@ -41,13 +41,15 @@ RETRY_DELAY = 5
 def extract_policy_id(text: str, filename: str) -> str:
     """Extract policy ID from text or filename."""
     patterns = [
-        r'Policy\s*(?:Number|#|No\.?)?[:\s]+([A-Z0-9]+)',
-        r'(\d{4}R\d{4}[A-Z]?)',
+        r'Policy\s*Number\s+(\d{4}R\d{4}[A-Z]?)',  # "Policy Number 2026R0005A"
+        r'(\d{4}R\d{4}[A-Z]?)',  # Just the pattern anywhere
+        r'Policy\s*(?:Number|#|No\.?)?[:\s]+([A-Z0-9]{8,})',  # Generic policy number
     ]
     for pattern in patterns:
-        match = re.search(pattern, text[:2000], re.IGNORECASE)
+        match = re.search(pattern, text[:3000], re.IGNORECASE)
         if match:
             return match.group(1)
+    # Fallback to filename-based ID
     return filename.replace('.txt', '').replace('_Raw', '').replace('UHC_', '')
 
 
@@ -70,25 +72,40 @@ def load_policy_text(policy_file: Path) -> tuple:
     return text, policy_id, policy_name
 
 
-def load_attachment_metadata(policy_id: str, policy_name: str) -> list:
+def load_attachment_metadata(policy_id: str, policy_name: str, policy_filename: str = "") -> list:
     """Load attachment metadata for a policy."""
     attachments = []
     if not OUTPUT_METADATA_DIR.exists():
         return attachments
     
-    # Create search patterns from policy name
-    name_parts = policy_name.lower().replace('_', ' ').replace('-', ' ').split()
-    key_words = [w for w in name_parts if len(w) > 3 and w not in ['policy', 'commercial', 'reimbursement']]
+    # Create search patterns from policy name and filename
+    name_parts = policy_name.lower().replace('_', ' ').replace('-', ' ').replace(',', ' ').split()
+    key_words = [w for w in name_parts if len(w) > 3 and w not in ['policy', 'commercial', 'reimbursement', 'professional']]
+    
+    # Also extract keywords from policy filename (e.g., "UHC_Global_Days_Policy_Raw.txt" -> ["global", "days"])
+    if policy_filename:
+        filename_parts = policy_filename.lower().replace('_', ' ').replace('-', ' ').split()
+        filename_keywords = [w for w in filename_parts if len(w) > 3 and w not in ['uhc', 'policy', 'raw', 'txt']]
+        key_words.extend(filename_keywords)
+    
+    # Remove duplicates
+    key_words = list(set(key_words))
+    logger.debug(f"Attachment search keywords: {key_words}")
     
     for meta_file in OUTPUT_METADATA_DIR.glob("*_metadata.json"):
         try:
             with open(meta_file, 'r', encoding='utf-8') as f:
                 meta = json.load(f)
             filename_lower = meta_file.name.lower()
+            
+            # Match by policy ID
             if policy_id.lower() in filename_lower:
                 attachments.append(meta)
-            elif any(kw in filename_lower for kw in key_words[:2]):
+                logger.debug(f"Matched attachment by policy_id: {meta_file.name}")
+            # Match by keywords (at least 2 keywords must match)
+            elif sum(1 for kw in key_words if kw in filename_lower) >= 1:
                 attachments.append(meta)
+                logger.debug(f"Matched attachment by keywords: {meta_file.name}")
         except Exception as e:
             logger.warning(f"Could not load {meta_file.name}: {e}")
     
@@ -204,8 +221,8 @@ def generate_denial_rules(policy_file: Path) -> dict:
     logger.info(f"Policy Name: {policy_name[:50]}...")
     logger.debug(f"Text Length: {len(policy_text):,} chars")
     
-    # Load attachments
-    attachments = load_attachment_metadata(policy_id, policy_name)
+    # Load attachments (pass filename for better matching)
+    attachments = load_attachment_metadata(policy_id, policy_name, policy_file.name)
     logger.info(f"Attachments: {len(attachments)}")
     
     # Create prompt
@@ -215,18 +232,21 @@ def generate_denial_rules(policy_file: Path) -> dict:
     # Initialize client
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
     
-    # Call LLM with retry
+    # Call LLM with retry (using streaming for long requests)
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             logger.info(f"Calling {LLM_MODEL} (attempt {attempt}/{MAX_RETRIES})...")
             
-            response = client.messages.create(
+            # Use streaming to handle long requests
+            response_text = ""
+            with client.messages.stream(
                 model=LLM_MODEL,
                 max_tokens=LLM_MAX_TOKENS_GENERATOR,
                 messages=[{"role": "user", "content": prompt}]
-            )
+            ) as stream:
+                for text in stream.text_stream:
+                    response_text += text
             
-            response_text = response.content[0].text
             logger.debug(f"Response Length: {len(response_text):,} chars")
             
             # Extract JSON
