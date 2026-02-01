@@ -1,0 +1,29 @@
+# Policy Ontology Extraction System - Requirements
+# LangChain + LangGraph + Claude Sonnet 4
+
+# Core LangChain
+langchain>=0.3.0
+langchain-anthropic>=0.3.0
+langchain-core>=0.3.0
+langgraph>=0.2.0
+
+# Anthropic Claude
+anthropic>=0.39.0
+
+# Neo4j
+neo4j>=5.0.0
+
+# Data Processing
+pandas>=2.0.0
+openpyxl>=3.1.0  # Excel support
+pydantic>=2.0.0
+
+# HTTP
+httpx>=0.27.0
+
+# Utils
+python-dotenv>=1.0.0
+tenacity>=8.0.0  # Retry logic
+
+# Optional - for better JSON handling
+orjson>=3.9.0
