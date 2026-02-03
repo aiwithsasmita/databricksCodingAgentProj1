@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolicyDB - Healthcare Policy Knowledge Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e4e4e4;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf, #e040fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .header .tagline {
+            font-size: 1.3rem;
+            color: #a0a0a0;
+        }
+        
+        .header .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(0,212,255,0.1);
+            padding: 20px 40px;
+            border-radius: 15px;
+            border: 1px solid rgba(0,212,255,0.3);
+        }
+        
+        .stat-box .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .stat-box .label {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 .icon {
+            font-size: 1.8rem;
+        }
+        
+        /* Versioning Timeline */
+        .version-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .version-timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
+        }
+        
+        .version-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .version-item.active {
+            border-left-color: #00ff88;
+            background: rgba(0,255,136,0.1);
+        }
+        
+        .version-item.inactive {
+            border-left-color: #ff6b6b;
+            opacity: 0.7;
+        }
+        
+        .version-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00d4ff;
+            border: 3px solid #1a1a2e;
+        }
+        
+        .version-item.active::before {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .version-item .version-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .version-item .rule-id {
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .version-item .status {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .status.active {
+            background: rgba(0,255,136,0.2);
+            color: #00ff88;
+        }
+        
+        .status.expired {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+        }
+        
+        .version-item .dates {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        /* Impact Table */
+        .impact-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .impact-table th,
+        .impact-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .impact-table th {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .impact-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .impact-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .impact-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        }
+        
+        .dollar-amount {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        
+        /* Provider Cards */
+        .provider-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .provider-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        
+        .provider-rank {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .provider-rank.gold { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
+        .provider-rank.silver { background: linear-gradient(135deg, #c0c0c0, #808080); color: #000; }
+        .provider-rank.bronze { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+        .provider-rank.normal { background: rgba(255,255,255,0.1); color: #888; }
+        
+        .provider-info {
+            flex: 1;
+        }
+        
+        .provider-name {
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .provider-specialty {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .provider-flags {
+            text-align: right;
+        }
+        
+        .flag-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        
+        .flag-label {
+            font-size: 0.75rem;
+            color: #888;
+        }
+        
+        /* Claim Mapping Flow */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .flow-number {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .flow-content {
+            flex: 1;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        
+        .flow-title {
+            font-weight: 600;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+        
+        .flow-desc {
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .flow-arrow {
+            width: 40px;
+            display: flex;
+            justify-content: center;
+            color: #00d4ff;
+            font-size: 1.5rem;
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 250px;
+        }
+        
+        /* Full Width Card */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        /* Code Block */
+        .code-block {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            border: 1px solid rgba(0,212,255,0.3);
+        }
+        
+        .code-block .keyword { color: #ff79c6; }
+        .code-block .string { color: #f1fa8c; }
+        .code-block .function { color: #50fa7b; }
+        .code-block .comment { color: #6272a4; }
+        
+        /* Capabilities Grid */
+        .capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .capability {
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .capability:hover {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        
+        .capability .cap-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .capability .cap-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .capability .cap-desc {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .grid { grid-template-columns: 1fr; }
+            .header .stats { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>PolicyDB</h1>
+            <p class="tagline">Healthcare Policy Knowledge Graph for Intelligent Claim Adjudication</p>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="number">50+</div>
+                    <div class="label">Policies Loaded</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">500+</div>
+                    <div class="label">Denial Rules</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">300+</div>
+                    <div class="label">Fraud Tactics</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">$2.5M</div>
+                    <div class="label">Savings Identified</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Capabilities Overview -->
+        <div class="card full-width">
+            <h2><span class="icon">🎯</span> What PolicyDB Can Do</h2>
+            <div class="capabilities">
+                <div class="capability">
+                    <div class="cap-icon">📋</div>
+                    <div class="cap-title">Rule Versioning</div>
+                    <div class="cap-desc">Track rule changes over time with effective dates</div>
+                </div>
+                <div class="capability">
+                    <div class="cap-icon">💰</div>
+                    <div class="cap-title">Dollar Impact</div>
+                    <div class="cap-desc">Prioritize high-value denial rules</div>
+                </div>
+                <div class="capability">
+                    <div class="cap-icon">🔍</div>
+                    <div class="cap-title">Abuse Detection</div>
+                    <div class="cap-desc">Identify most exploited rules & tactics</div>
+                </div>
+                <div class="capability">
+                    <div class="cap-icon">👤</div>
+                    <div class="cap-title">Provider Analytics</div>
+                    <div class="cap-desc">Flag suspicious billing patterns</div>
+                </div>
+                <div class="capability">
+                    <div class="cap-icon">🗺️</div>
+                    <div class="cap-title">Claim Mapping</div>
+                    <div class="cap-desc">Route claims to correct policies</div>
+                </div>
+                <div class="capability">
+                    <div class="cap-icon">⚡</div>
+                    <div class="cap-title">Real-time Query</div>
+                    <div class="cap-desc">Millisecond rule lookups via Neo4j</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Rule Versioning -->
+            <div class="card">
+                <h2><span class="icon">📅</span> Policy Rule Versioning</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9rem;">
+                    Every rule has <code style="color: #00d4ff;">effective_date</code> and <code style="color: #00d4ff;">end_date</code>. 
+                    When <code style="color: #00ff88;">end_date = null</code>, the rule is <strong>ACTIVE</strong>.
+                </p>
+                <div class="version-timeline">
+                    <div class="version-item active">
+                        <div class="version-header">
+                            <span class="rule-id">DENY_001 v3.0</span>
+                            <span class="status active">ACTIVE</span>
+                        </div>
+                        <div class="dates">
+                            <strong>Effective:</strong> 2026-01-15 → <strong>End:</strong> <span style="color: #00ff88;">NULL</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.85rem; color: #aaa;">
+                            Modifier 25 required for same-day E/M services
+                        </div>
+                    </div>
+                    <div class="version-item inactive">
+                        <div class="version-header">
+                            <span class="rule-id">DENY_001 v2.0</span>
+                            <span class="status expired">EXPIRED</span>
+                        </div>
+                        <div class="dates">
+                            <strong>Effective:</strong> 2025-06-01 → <strong>End:</strong> 2026-01-14
+                        </div>
+                    </div>
+                    <div class="version-item inactive">
+                        <div class="version-header">
+                            <span class="rule-id">DENY_001 v1.0</span>
+                            <span class="status expired">EXPIRED</span>
+                        </div>
+                        <div class="dates">
+                            <strong>Effective:</strong> 2024-01-01 → <strong>End:</strong> 2025-05-31
+                        </div>
+                    </div>
+                </div>
+                <div class="code-block" style="margin-top: 20px;">
+                    <span class="comment">// Query active rules only</span><br>
+                    <span class="keyword">MATCH</span> (r:<span class="function">DenialRule</span>)<br>
+                    <span class="keyword">WHERE</span> r.end_date <span class="keyword">IS NULL</span><br>
+                    <span class="keyword">RETURN</span> r
+                </div>
+            </div>
+
+            <!-- High Dollar Impact -->
+            <div class="card">
+                <h2><span class="icon">💰</span> High Dollar Impact Rules</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9rem;">
+                    Prioritize rules by financial impact to maximize savings
+                </p>
+                <table class="impact-table">
+                    <thead>
+                        <tr>
+                            <th>Rule</th>
+                            <th>Savings</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">DENY_003</div>
+                                <div style="font-size: 0.8rem; color: #888;">Global Period Violation</div>
+                            </td>
+                            <td class="dollar-amount">$450K</td>
+                            <td>
+                                <div class="impact-bar"><div class="impact-bar-fill" style="width: 95%;"></div></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">DENY_001</div>
+                                <div style="font-size: 0.8rem; color: #888;">Modifier 25 Missing</div>
+                            </td>
+                            <td class="dollar-amount">$380K</td>
+                            <td>
+                                <div class="impact-bar"><div class="impact-bar-fill" style="width: 80%;"></div></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">DENY_007</div>
+                                <div style="font-size: 0.8rem; color: #888;">Unbundling Detection</div>
+                            </td>
+                            <td class="dollar-amount">$290K</td>
+                            <td>
+                                <div class="impact-bar"><div class="impact-bar-fill" style="width: 65%;"></div></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">DENY_012</div>
+                                <div style="font-size: 0.8rem; color: #888;">Duplicate Service</div>
+                            </td>
+                            <td class="dollar-amount">$175K</td>
+                            <td>
+                                <div class="impact-bar"><div class="impact-bar-fill" style="width: 40%;"></div></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(0,255,136,0.1); border-radius: 10px; border-left: 3px solid #00ff88;">
+                    <strong style="color: #00ff88;">Total Identified Savings:</strong> <span class="dollar-amount">$1.29M</span>
+                </div>
+            </div>
+
+            <!-- Most Abused Rules -->
+            <div class="card">
+                <h2><span class="icon">🔥</span> Most Triggered Rules & Tactics</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9rem;">
+                    Rules and fraud tactics with highest trigger rates
+                </p>
+                <div class="chart-container">
+                    <canvas id="abuseChart"></canvas>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: #00d4ff; border-radius: 3px;"></div>
+                        <span style="font-size: 0.85rem; color: #888;">Denial Rules</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: #ff6b6b; border-radius: 3px;"></div>
+                        <span style="font-size: 0.85rem; color: #888;">Fraud Tactics</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Flagged Providers -->
+            <div class="card">
+                <h2><span class="icon">⚠️</span> Top Flagged Providers</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9rem;">
+                    Providers with suspicious cross-policy billing patterns
+                </p>
+                <div class="provider-list">
+                    <div class="provider-item">
+                        <div class="provider-rank gold">1</div>
+                        <div class="provider-info">
+                            <div class="provider-name">ABC Medical Group</div>
+                            <div class="provider-specialty">Multi-specialty • TIN: ***4521</div>
+                        </div>
+                        <div class="provider-flags">
+                            <div class="flag-count">847</div>
+                            <div class="flag-label">flags</div>
+                        </div>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-rank silver">2</div>
+                        <div class="provider-info">
+                            <div class="provider-name">Premier Surgery Center</div>
+                            <div class="provider-specialty">Surgery • TIN: ***8832</div>
+                        </div>
+                        <div class="provider-flags">
+                            <div class="flag-count">623</div>
+                            <div class="flag-label">flags</div>
+                        </div>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-rank bronze">3</div>
+                        <div class="provider-info">
+                            <div class="provider-name">City Diagnostic Labs</div>
+                            <div class="provider-specialty">Laboratory • TIN: ***1199</div>
+                        </div>
+                        <div class="provider-flags">
+                            <div class="flag-count">412</div>
+                            <div class="flag-label">flags</div>
+                        </div>
+                    </div>
+                    <div class="provider-item">
+                        <div class="provider-rank normal">4</div>
+                        <div class="provider-info">
+                            <div class="provider-name">Regional Imaging</div>
+                            <div class="provider-specialty">Radiology • TIN: ***7744</div>
+                        </div>
+                        <div class="provider-flags">
+                            <div class="flag-count">298</div>
+                            <div class="flag-label">flags</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="code-block" style="margin-top: 20px;">
+                    <span class="comment">// Find providers flagged across multiple policies</span><br>
+                    <span class="keyword">MATCH</span> (p:<span class="function">Provider</span>)-[:FLAGGED_BY]->(r:<span class="function">DenialRule</span>)<br>
+                    <span class="keyword">WITH</span> p, <span class="function">count</span>(<span class="keyword">DISTINCT</span> r) <span class="keyword">AS</span> flags<br>
+                    <span class="keyword">RETURN</span> p <span class="keyword">ORDER BY</span> flags <span class="keyword">DESC</span>
+                </div>
+            </div>
+
+            <!-- Claim to Policy Mapping -->
+            <div class="card full-width">
+                <h2><span class="icon">🗺️</span> Claim to Policy Mapping</h2>
+                <p style="color: #888; margin-bottom: 25px; font-size: 0.9rem;">
+                    How incoming claims are matched to the correct policies and rules for adjudication
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div class="flow-diagram">
+                        <div class="flow-step">
+                            <div class="flow-number">1</div>
+                            <div class="flow-content">
+                                <div class="flow-title">Receive Claim</div>
+                                <div class="flow-desc">Extract CPT code, modifiers, POS, provider TIN, member ID</div>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-number">2</div>
+                            <div class="flow-content">
+                                <div class="flow-title">Match by Line of Business</div>
+                                <div class="flow-desc">Filter policies by Commercial, Medicare, or Medicaid</div>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-number">3</div>
+                            <div class="flow-content">
+                                <div class="flow-title">Match by CPT Code</div>
+                                <div class="flow-desc">Find all rules where claim CPT is in required_codes</div>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-number">4</div>
+                            <div class="flow-content">
+                                <div class="flow-title">Evaluate Detection Logic</div>
+                                <div class="flow-desc">Check modifiers, same-day services, global periods</div>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-number">5</div>
+                            <div class="flow-content">
+                                <div class="flow-title">Return Decision</div>
+                                <div class="flow-desc" style="color: #00ff88;">PAY or DENY with reason codes</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="background: rgba(0,0,0,0.4); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                            <div style="font-weight: 600; color: #00d4ff; margin-bottom: 15px;">Sample Claim Input</div>
+                            <div class="code-block" style="background: transparent; border: none; padding: 0;">
+{<br>
+&nbsp;&nbsp;<span class="string">"claim_id"</span>: <span class="string">"CLM-2026-001234"</span>,<br>
+&nbsp;&nbsp;<span class="string">"cpt_code"</span>: <span class="string">"99213"</span>,<br>
+&nbsp;&nbsp;<span class="string">"modifier"</span>: <span class="string">""</span>,<br>
+&nbsp;&nbsp;<span class="string">"pos"</span>: <span class="string">"11"</span>,<br>
+&nbsp;&nbsp;<span class="string">"date_of_service"</span>: <span class="string">"2026-01-28"</span>,<br>
+&nbsp;&nbsp;<span class="string">"provider_tin"</span>: <span class="string">"123456789"</span>,<br>
+&nbsp;&nbsp;<span class="string">"amount"</span>: <span class="keyword">125.00</span><br>
+}
+                            </div>
+                        </div>
+                        <div style="background: rgba(255,107,107,0.1); border-radius: 15px; padding: 20px; border: 1px solid rgba(255,107,107,0.3);">
+                            <div style="font-weight: 600; color: #ff6b6b; margin-bottom: 15px;">⚠️ Denial Response</div>
+                            <div class="code-block" style="background: transparent; border: none; padding: 0;">
+{<br>
+&nbsp;&nbsp;<span class="string">"decision"</span>: <span class="string" style="color: #ff6b6b;">"DENY"</span>,<br>
+&nbsp;&nbsp;<span class="string">"rule_triggered"</span>: <span class="string">"DENY_001"</span>,<br>
+&nbsp;&nbsp;<span class="string">"reason"</span>: <span class="string">"Modifier 25 required for E/M service on same day as procedure"</span>,<br>
+&nbsp;&nbsp;<span class="string">"policy_id"</span>: <span class="string">"2026R0005A"</span><br>
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Neo4j Query Examples -->
+            <div class="card">
+                <h2><span class="icon">⚡</span> Neo4j Power Queries</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9rem;">
+                    Lightning-fast graph queries for real-time adjudication
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <div style="font-size: 0.85rem; color: #00d4ff; margin-bottom: 8px;">Find rules by CPT code:</div>
+                        <div class="code-block">
+                            <span class="keyword">MATCH</span> (r:<span class="function">DenialRule</span>)-[:AFFECTS_CODE]->(c:<span class="function">CPTCode</span> {code: <span class="string">'99213'</span>})<br>
+                            <span class="keyword">WHERE</span> r.end_date <span class="keyword">IS NULL</span><br>
+                            <span class="keyword">RETURN</span> r.rule_key, r.rule_name
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.85rem; color: #00d4ff; margin-bottom: 8px;">High-impact rules:</div>
+                        <div class="code-block">
+                            <span class="keyword">MATCH</span> (r:<span class="function">DenialRule</span>)<br>
+                            <span class="keyword">RETURN</span> r <span class="keyword">ORDER BY</span> r.total_financial_impact <span class="keyword">DESC</span><br>
+                            <span class="keyword">LIMIT</span> 10
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.85rem; color: #00d4ff; margin-bottom: 8px;">Fraud tactics exploiting a rule:</div>
+                        <div class="code-block">
+                            <span class="keyword">MATCH</span> (f:<span class="function">FraudTactic</span>)-[:EXPLOITS_RULE]->(r:<span class="function">DenialRule</span> {rule_key: <span class="string">'DENY_001'</span>})<br>
+                            <span class="keyword">RETURN</span> f.tactic_name, f.risk_level
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Member Analytics -->
+            <div class="card">
+                <h2><span class="icon">👥</span> Top Members by Denials</h2>
+                <p style="color: #888; margin-bottom: 20px; font-size: 0.9rem;">
+                    Members with highest denial rates (potential education opportunities)
+                </p>
+                <div class="chart-container">
+                    <canvas id="memberChart"></canvas>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(0,212,255,0.1); border-radius: 10px; border-left: 3px solid #00d4ff;">
+                    <strong style="color: #00d4ff;">Insight:</strong> 
+                    <span style="color: #aaa;">Top 10 members account for 23% of all denials. Consider targeted outreach.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="card full-width">
+            <h2><span class="icon">🏗️</span> System Architecture</h2>
+            <div style="text-align: center; padding: 30px 0;">
+                <svg viewBox="0 0 900 300" style="max-width: 100%; height: auto;">
+                    <!-- Policy Sources -->
+                    <rect x="20" y="100" width="120" height="80" rx="10" fill="rgba(0,212,255,0.2)" stroke="#00d4ff" stroke-width="2"/>
+                    <text x="80" y="135" fill="#00d4ff" text-anchor="middle" font-size="12" font-weight="bold">Policy</text>
+                    <text x="80" y="155" fill="#888" text-anchor="middle" font-size="10">Documents</text>
+                    
+                    <!-- Attachments -->
+                    <rect x="20" y="200" width="120" height="60" rx="10" fill="rgba(123,44,191,0.2)" stroke="#7b2cbf" stroke-width="2"/>
+                    <text x="80" y="235" fill="#7b2cbf" text-anchor="middle" font-size="12" font-weight="bold">Attachments</text>
+                    
+                    <!-- Arrow 1 -->
+                    <path d="M 145 140 L 195 140" stroke="#00d4ff" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <path d="M 145 230 L 175 230 L 175 160 L 195 160" stroke="#7b2cbf" stroke-width="2" fill="none"/>
+                    
+                    <!-- Agent Pipeline -->
+                    <rect x="200" y="80" width="200" height="140" rx="15" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                    <text x="300" y="105" fill="#fff" text-anchor="middle" font-size="14" font-weight="bold">Agent Pipeline</text>
+                    <text x="300" y="130" fill="#888" text-anchor="middle" font-size="10">Agent 0: Metadata</text>
+                    <text x="300" y="148" fill="#888" text-anchor="middle" font-size="10">Agent 1-2: Denial Rules</text>
+                    <text x="300" y="166" fill="#888" text-anchor="middle" font-size="10">Agent 3-4: Fraud Tactics</text>
+                    <text x="300" y="184" fill="#888" text-anchor="middle" font-size="10">Agent 5: Neo4j Finalizer</text>
+                    <text x="300" y="208" fill="#00d4ff" text-anchor="middle" font-size="10">Claude Sonnet 4</text>
+                    
+                    <!-- Arrow 2 -->
+                    <path d="M 405 150 L 455 150" stroke="#00ff88" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- Neo4j -->
+                    <circle cx="530" cy="150" r="60" fill="rgba(0,255,136,0.2)" stroke="#00ff88" stroke-width="2"/>
+                    <text x="530" y="145" fill="#00ff88" text-anchor="middle" font-size="14" font-weight="bold">Neo4j</text>
+                    <text x="530" y="165" fill="#888" text-anchor="middle" font-size="10">Knowledge Graph</text>
+                    
+                    <!-- Arrow 3 -->
+                    <path d="M 595 150 L 645 150" stroke="#00ff88" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- Applications -->
+                    <rect x="650" y="50" width="140" height="200" rx="15" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                    <text x="720" y="80" fill="#fff" text-anchor="middle" font-size="12" font-weight="bold">Applications</text>
+                    <text x="720" y="110" fill="#00d4ff" text-anchor="middle" font-size="10">✓ Claim Adjudication</text>
+                    <text x="720" y="130" fill="#00d4ff" text-anchor="middle" font-size="10">✓ Fraud Detection</text>
+                    <text x="720" y="150" fill="#00d4ff" text-anchor="middle" font-size="10">✓ Provider Analytics</text>
+                    <text x="720" y="170" fill="#00d4ff" text-anchor="middle" font-size="10">✓ Impact Analysis</text>
+                    <text x="720" y="190" fill="#00d4ff" text-anchor="middle" font-size="10">✓ Rule Versioning</text>
+                    <text x="720" y="210" fill="#00d4ff" text-anchor="middle" font-size="10">✓ Compliance Audit</text>
+                    <text x="720" y="230" fill="#00d4ff" text-anchor="middle" font-size="10">✓ Reporting</text>
+                    
+                    <!-- Arrow marker definition -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#00d4ff"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>PolicyDB Knowledge Graph • Powered by Neo4j & Claude Sonnet 4</p>
+            <p style="margin-top: 10px; color: #444;">© 2026 Healthcare Policy Intelligence System</p>
+        </div>
+    </div>
+
+    <script>
+        // Abuse Chart
+        const abuseCtx = document.getElementById('abuseChart').getContext('2d');
+        new Chart(abuseCtx, {
+            type: 'bar',
+            data: {
+                labels: ['DENY_001', 'DENY_003', 'FRAUD_007', 'DENY_012', 'FRAUD_002', 'DENY_005'],
+                datasets: [{
+                    label: 'Denial Rules',
+                    data: [1250, 980, 0, 720, 0, 540],
+                    backgroundColor: 'rgba(0, 212, 255, 0.7)',
+                    borderColor: '#00d4ff',
+                    borderWidth: 1
+                }, {
+                    label: 'Fraud Tactics',
+                    data: [0, 0, 890, 0, 650, 0],
+                    backgroundColor: 'rgba(255, 107, 107, 0.7)',
+                    borderColor: '#ff6b6b',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#888' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#888' },
+                        title: {
+                            display: true,
+                            text: 'Times Triggered',
+                            color: '#888'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Member Chart
+        const memberCtx = document.getElementById('memberChart').getContext('2d');
+        new Chart(memberCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Top 10 Members', 'Top 11-50', 'Others'],
+                datasets: [{
+                    data: [23, 35, 42],
+                    backgroundColor: [
+                        'rgba(255, 107, 107, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(0, 212, 255, 0.8)'
+                    ],
+                    borderColor: [
+                        '#ff6b6b',
+                        '#ffc107',
+                        '#00d4ff'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#888',
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

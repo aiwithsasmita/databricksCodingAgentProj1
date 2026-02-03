@@ -248,18 +248,21 @@ def validate_denial_rules(policy_id: str) -> dict:
     # Initialize client
     client = Anthropic(api_key=ANTHROPIC_API_KEY)
     
-    # Call LLM with retry
+    # Call LLM with retry (using streaming for long requests)
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             logger.info(f"Calling {LLM_MODEL} (attempt {attempt}/{MAX_RETRIES})...")
             
-            response = client.messages.create(
+            # Use streaming to handle long requests
+            response_text = ""
+            with client.messages.stream(
                 model=LLM_MODEL,
                 max_tokens=LLM_MAX_TOKENS_VALIDATOR,
                 messages=[{"role": "user", "content": prompt}]
-            )
+            ) as stream:
+                for text in stream.text_stream:
+                    response_text += text
             
-            response_text = response.content[0].text
             logger.debug(f"Response: {len(response_text):,} chars")
             
             # Extract JSON
