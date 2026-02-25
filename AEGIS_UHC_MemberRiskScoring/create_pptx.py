@@ -3,9 +3,11 @@ from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
+from pptx.oxml.ns import qn
+from lxml import etree
 import os
 
-OUT = r"D:\AI_Products_Dev\Products\AgenticAIClass_Docs\AEGIS_MemberRiskScoring_VP_CFO_Deck_v3.pptx"
+OUT = r"D:\AI_Products_Dev\Products\AgenticAIClass_Docs\AEGIS_MemberRiskScoring_VP_CFO_Deck_v8.pptx"
 
 NAVY     = RGBColor(0x1B, 0x3A, 0x5C)
 MED_BLUE = RGBColor(0x44, 0x72, 0xC4)
@@ -69,15 +71,47 @@ def add_bullet_list(slide, x, y, w, h, items, size=13, color=BLACK, spacing=Pt(6
 def add_header_bar(slide):
     add_rect(slide, Inches(0), Inches(0), prs.slide_width, Inches(0.08), NAVY)
 
-def add_footer(slide, text="CONFIDENTIAL  |  UHC AEGIS Platform  |  February 2026"):
-    add_text_box(slide, Inches(0.5), Inches(7.05), Inches(12), Inches(0.3),
-                 text, size=8, color=GRAY, align=PP_ALIGN.CENTER)
+SLIDE_NUM = [0]
+
+def add_footer(slide):
+    SLIDE_NUM[0] += 1
+    add_rect(slide, Inches(0), Inches(7.15), prs.slide_width, Inches(0.35), WHITE)
+
+    txBox = slide.shapes.add_textbox(Inches(0.4), Inches(7.15), Inches(5), Inches(0.3))
+    tf = txBox.text_frame
+    tf.word_wrap = False
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.LEFT
+
+    run1 = p.add_run()
+    run1.text = "UNITEDHEALTHGROUP"
+    run1.font.size = Pt(7)
+    run1.font.color.rgb = NAVY
+    run1.font.bold = True
+    run1.font.name = "Calibri"
+
+    run2 = p.add_run()
+    run2.text = "  (Optum)"
+    run2.font.size = Pt(7)
+    run2.font.color.rgb = ACCENT
+    run2.font.bold = True
+    run2.font.name = "Calibri"
+
+    add_text_box(slide, Inches(3.5), Inches(7.15), Inches(6.5), Inches(0.3),
+                 "\u00a9 2026 UnitedHealth Group Inc. All rights reserved.",
+                 size=7, color=GRAY, align=PP_ALIGN.CENTER, font_name="Calibri")
+
+    add_text_box(slide, Inches(11.8), Inches(7.15), Inches(1.2), Inches(0.3),
+                 str(SLIDE_NUM[0]), size=7, color=GRAY, bold=True,
+                 align=PP_ALIGN.RIGHT, font_name="Calibri")
 
 # ══════════════════════════════════════════════════════════════
 # SLIDE 1 — TITLE
 # ══════════════════════════════════════════════════════════════
 sl = prs.slides.add_slide(prs.slide_layouts[6])  # blank
-add_rect(sl, Inches(0), Inches(5.8), prs.slide_width, Inches(0.06), ACCENT)
+
+add_text_box(sl, Inches(1), Inches(0.8), Inches(11), Inches(0.5),
+             "NEXT Gen Project", size=16, color=ACCENT, bold=True, align=PP_ALIGN.CENTER)
 
 add_text_box(sl, Inches(1), Inches(1.5), Inches(11), Inches(1.2),
              "AEGIS", size=54, color=NAVY, bold=True, align=PP_ALIGN.CENTER)
@@ -87,12 +121,50 @@ add_text_box(sl, Inches(1), Inches(3.8), Inches(11), Inches(0.5),
              "Member Risk Scoring  &  Provider Risk Scoring", size=20, color=NAVY, bold=True, align=PP_ALIGN.CENTER)
 
 add_text_box(sl, Inches(1), Inches(5.2), Inches(11), Inches(0.4),
-             "Executive Briefing  |  VP & CFO Review  |  February 2026", size=14, color=GRAY, align=PP_ALIGN.CENTER)
+             "February 2026", size=14, color=GRAY, align=PP_ALIGN.CENTER)
 add_text_box(sl, Inches(1), Inches(6.2), Inches(11), Inches(0.4),
              "UnitedHealth Group  |  Data Science & Analytics", size=12, color=GRAY, align=PP_ALIGN.CENTER)
 
+add_footer(sl)
+
 # ══════════════════════════════════════════════════════════════
-# SLIDE 2 — WHY NOW: THE MLR CRISIS (Data-Driven Story)
+# SLIDE 2 — AGENDA
+# ══════════════════════════════════════════════════════════════
+sl = prs.slides.add_slide(prs.slide_layouts[6])
+add_header_bar(sl)
+add_text_box(sl, Inches(0.6), Inches(0.3), Inches(12), Inches(0.6),
+             "Agenda", size=28, color=NAVY, bold=True)
+
+agenda_items = [
+    ("01", "Why Now? The Medical Cost Crisis", "UHC MLR trend 2023-2025 from earnings data"),
+    ("02", "The Pricing Gap", "Quarterly MCR trajectory and actuarial blind spot"),
+    ("03", "Three Compounding Problems", "Cost concentration, pricing gap, no early warning"),
+    ("04", "Overall Objective", "AEGIS platform: Member + Provider risk scoring"),
+    ("05", "Member Risk Scoring", "Two-stage ML pipeline, risk tiers, scale"),
+    ("06", "Provider Risk Scoring", "Clustering, Admin/Coding Index, Economic Index"),
+    ("07", "End-to-End Architecture", "Data layers, logic layers, dashboard, end users"),
+    ("08", "Timeline & Roadmap", "4 MVPs: Feb 2026 to Jun 2026"),
+    ("09", "Expected Operational Impact", "MCR levers, efficiency, strategic advantage"),
+    ("10", "Ask & Next Steps", "Approvals and actions needed"),
+]
+
+for i, (num, title, desc) in enumerate(agenda_items):
+    ay = Inches(1.15 + i * 0.56)
+    is_even = i % 2 == 0
+    row_bg = LIGHT_BG if is_even else WHITE
+
+    add_rect(sl, Inches(0.6), ay, Inches(12.1), Inches(0.52), row_bg)
+    add_rect(sl, Inches(0.6), ay, Inches(0.7), Inches(0.52), NAVY)
+    add_text_box(sl, Inches(0.65), ay + Inches(0.05), Inches(0.6), Inches(0.42),
+                 num, size=14, color=WHITE, bold=True, align=PP_ALIGN.CENTER)
+    add_text_box(sl, Inches(1.5), ay + Inches(0.05), Inches(5), Inches(0.42),
+                 title, size=13, color=NAVY, bold=True)
+    add_text_box(sl, Inches(6.5), ay + Inches(0.08), Inches(6), Inches(0.38),
+                 desc, size=11, color=GRAY)
+add_footer(sl)
+
+# ══════════════════════════════════════════════════════════════
+# SLIDE 3 — WHY NOW: THE MLR CRISIS (Data-Driven Story)
 # ══════════════════════════════════════════════════════════════
 sl = prs.slides.add_slide(prs.slide_layouts[6])
 add_header_bar(sl)
@@ -179,11 +251,34 @@ for i, (big_num, subtitle, detail, clr) in enumerate(impact_cards):
     add_text_box(sl, Inches(8.55), cy + Inches(0.05), Inches(4.2), Inches(1.25),
                  detail, size=10, color=BLACK)
 
-# Source footer
-add_text_box(sl, Inches(0.6), Inches(6.3), Inches(12), Inches(0.6),
-             "Sources:  [1] UNH 2025 Annual Earnings Release (Jan 27, 2026) - businesswire.com/news/home/20260126830491\n"
-             "[2] UNH Q4 2024 Earnings Release (Jan 16, 2025) - unitedhealthgroup.com/investors  |  [3] Becker's Payer Issues, Jan 2026",
-             size=7, color=SRC_CLR)
+# Source footer with clickable links
+src_box = sl.shapes.add_textbox(Inches(0.6), Inches(6.3), Inches(12), Inches(0.6))
+stf = src_box.text_frame
+stf.word_wrap = True
+
+src_links = [
+    ("Sources:\n", None),
+    ("[1] UNH 2025 Annual Earnings Release (Jan 27, 2026), pp 1-3  ",
+     "https://www.sec.gov/Archives/edgar/data/731766/000073176626000025/unh-20260127.htm"),
+    ("\n[2] UNH Q4 2024 Earnings Release (Jan 16, 2025), pp 1-2  ",
+     "https://www.unitedhealthgroup.com/newsroom/2025/2025-16-01-uhg-reports-fourth-quarter-results.html"),
+    ("\n[3] Becker's Payer Issues - Payers ranked by 2025 MLRs  ",
+     "https://www.beckerspayer.com/financial/payers-ranked-by-2025-medical-loss-ratios/"),
+]
+sp = stf.paragraphs[0]
+sp.alignment = PP_ALIGN.LEFT
+for txt, url in src_links:
+    r = sp.add_run()
+    r.text = txt
+    r.font.size = Pt(7)
+    r.font.name = "Calibri"
+    if url:
+        r.font.color.rgb = RGBColor(0x1A, 0x5C, 0xA8)
+        r.font.underline = True
+        hlink = r.hyperlink
+        hlink.address = url
+    else:
+        r.font.color.rgb = SRC_CLR
 
 add_footer(sl)
 
@@ -273,10 +368,40 @@ for i, b in enumerate(obj_bullets):
     add_text_box(sl, Inches(1.0), Inches(5.85 + i * 0.35), Inches(11.5), Inches(0.35),
                  f"\u25b8  {b}", size=10, color=LT_BLUE)
 
-add_text_box(sl, Inches(0.6), Inches(6.85), Inches(12), Inches(0.3),
-             "Sources:  UNH Q1-Q4 2025 Earnings Releases - unitedhealthgroup.com/investors  |  FierceHealthcare: \"UHC expects to lose 1.3M MA members\" Jan 2026\n"
-             "Norwood: \"UHC's MLR an eye-opening reminder of V28 impact\" - norwood.com  |  Becker's Payer Issues  |  SEC filings: 10-K, 10-Q (2024-2025)",
-             size=7, color=SRC_CLR)
+src_box2 = sl.shapes.add_textbox(Inches(0.6), Inches(6.85), Inches(12), Inches(0.5))
+stf2 = src_box2.text_frame
+stf2.word_wrap = True
+src_links2 = [
+    ("Sources:  ", None),
+    ("UNH Q1-Q4 2025 Quarterly Earnings Releases",
+     "https://www.unitedhealthgroup.com/investors/financial-reports.html"),
+    ("  |  ", None),
+    ("Becker's: Payers ranked by 2025 MLRs",
+     "https://www.beckerspayer.com/financial/payers-ranked-by-2025-medical-loss-ratios/"),
+    ("  |  ", None),
+    ("Becker's: UnitedHealth 2025 profit analysis",
+     "https://www.beckerspayer.com/financial/unitedhealths-2025-profit-dips-to-12-1b/"),
+    ("\n", None),
+    ("SEC 10-K/10-Q filings (2024-2025)",
+     "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000731766&type=10-K&dateb=&owner=include&count=10"),
+    ("  |  ", None),
+    ("Becker's: Care costs keep climbing for UnitedHealth",
+     "https://www.beckerspayer.com/payer/care-costs-keep-climbing-for-unitedhealth/"),
+]
+sp2 = stf2.paragraphs[0]
+sp2.alignment = PP_ALIGN.LEFT
+for txt, url in src_links2:
+    r = sp2.add_run()
+    r.text = txt
+    r.font.size = Pt(7)
+    r.font.name = "Calibri"
+    if url:
+        r.font.color.rgb = RGBColor(0x1A, 0x5C, 0xA8)
+        r.font.underline = True
+        hlink = r.hyperlink
+        hlink.address = url
+    else:
+        r.font.color.rgb = SRC_CLR
 
 # ══════════════════════════════════════════════════════════════
 # SLIDE 4 — PROBLEM STATEMENT
@@ -292,8 +417,8 @@ add_text_box(sl, Inches(0.6), Inches(1.0), Inches(12), Inches(0.5),
 
 boxes = [
     ("High-Cost Claimant\nConcentration",
-     "2.2% of members generate 23% of total medical spend. These members ARE identifiable 90 days before cost spikes, but we have no systematic prediction engine.\n\nWith 89.1% MCR, every avoidable high-cost event directly erodes operating margin.",
-     "2.2% of members = 23% of spend\nPredictable 90 days early"),
+     "Top 1% of members generate ~28% of total medical spend (EBRI 2023). Top 5% account for over half. These members ARE identifiable 90 days before cost spikes, but we have no systematic prediction engine.\n\nWith 89.1% MCR, every avoidable high-cost event directly erodes operating margin.",
+     "Top 1% = ~28% of spend (EBRI)\nPredictable 90 days early"),
     ("Actuarial Pricing\nBlind Spot",
      "Premiums are set using population-level historical trends. But medical costs accelerated faster than pricing could adjust -- MCR jumped 360 bps in 2 years.\n\nMember-level spend prediction gives Actuarial a 90-day forward view to price with, not a 12-month backward mirror.",
      "MCR went from 83.2% to 89.1%\nPricing could not keep up"),
@@ -312,6 +437,30 @@ for i, (title, desc, stat) in enumerate(boxes):
     r2 = add_rect(sl, bx + Inches(0.15), Inches(5.4), Inches(3.5), Inches(0.9), NAVY)
     add_text_box(sl, bx + Inches(0.25), Inches(5.45), Inches(3.3), Inches(0.8),
                  stat, size=11, color=WHITE, bold=True, align=PP_ALIGN.CENTER)
+
+src_box3 = sl.shapes.add_textbox(Inches(0.6), Inches(6.5), Inches(12), Inches(0.3))
+stf3 = src_box3.text_frame
+stf3.word_wrap = True
+sp3 = stf3.paragraphs[0]
+sp3.alignment = PP_ALIGN.LEFT
+for txt, url in [
+    ("Source:  ", None),
+    ("EBRI Issue Brief #493 - High-Cost Health Care Claimants (2023)",
+     "https://www.ebri.org/health/center-for-research-on-health-benefits-innovation/content/high-cost-health-care-claimants-health-spending-and-chronic-condition-prevalence-in-2021"),
+    ("  |  ", None),
+    ("NIHCM: Concentration of Health Care Spending",
+     "https://nihcm.org/publications/the-concentration-of-health-care-spending"),
+]:
+    r = sp3.add_run()
+    r.text = txt
+    r.font.size = Pt(7)
+    r.font.name = "Calibri"
+    if url:
+        r.font.color.rgb = RGBColor(0x1A, 0x5C, 0xA8)
+        r.font.underline = True
+        r.hyperlink.address = url
+    else:
+        r.font.color.rgb = SRC_CLR
 
 add_footer(sl)
 
@@ -416,8 +565,8 @@ add_text_box(sl, Inches(0.6), Inches(5.0), Inches(12), Inches(0.4),
 
 metrics = [
     ("50M+", "Total Members"),
-    ("2.2%", "High-Cost Concentration"),
-    ("23%", "of Spend from Top 2.2%"),
+    ("Top 1%", "Drive ~28% of Spend"),
+    ("Top 5%", "Drive ~57% of Spend"),
     ("85", "ML Features"),
     ("90 days", "Prediction Horizon"),
     ("4 Weeks", "MVP Timeline"),
