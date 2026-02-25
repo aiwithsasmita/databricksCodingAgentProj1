@@ -1,0 +1,230 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="flow" name="AEGIS - Early Warning Dashboard">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ══════ TITLE ══════ -->
+        <mxCell id="2" value="&lt;b&gt;Advanced Early Warning Signal Intelligent System&lt;/b&gt;" style="text=;html=1;align=center;verticalAlign=middle;fontSize=21;fontStyle=0;fontColor=#1B3A5C;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="300" y="10" width="900" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Use Case 1: Member Risk Scoring  +  Provider Risk Scoring  |  UHC" style="text=;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#999999;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="380" y="42" width="740" height="14" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!--     LEFT BOX — MEMBER RISK SCORING                        -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <mxCell id="100" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF1F8;strokeColor=#B4C7DC;strokeWidth=1.5;arcSize=2;" parent="1" vertex="1">
+          <mxGeometry x="30" y="70" width="700" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="101" value="MEMBER RISK SCORING" style="text=;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#1B3A5C;strokeColor=none;fillColor=none;spacingLeft=8;" parent="1" vertex="1">
+          <mxGeometry x="38" y="74" width="260" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- ── Member Data Layer ── -->
+        <mxCell id="102" value="DATA LAYER" style="text=;html=1;align=left;verticalAlign=middle;fontSize=9;fontStyle=1;fontColor=#4472C4;strokeColor=none;fillColor=none;spacingLeft=4;" parent="1" vertex="1">
+          <mxGeometry x="48" y="102" width="80" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="110" value="Medical Claims&lt;br&gt;&lt;i&gt;837P / 837I&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="50" y="122" width="145" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="111" value="Call Center&lt;br&gt;&lt;i&gt;IVR / CRM&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="210" y="122" width="145" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="112" value="Claim Remittance&lt;br&gt;&lt;i&gt;835 / EOB&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="370" y="122" width="145" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="113" value="Enrollment&lt;br&gt;&lt;i&gt;834 Eligibility&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="530" y="122" width="145" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- Member pipeline -->
+        <mxCell id="120" value="ETL &amp; Ingestion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4472C4;fontColor=#FFFFFF;strokeColor=#2F5496;fontSize=10;fontStyle=1;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="60" y="192" width="170" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="121" value="Data Quality" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4472C4;fontColor=#FFFFFF;strokeColor=#2F5496;fontSize=10;fontStyle=1;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="265" y="192" width="170" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="122" value="Feature Store&lt;br&gt;&lt;i&gt;85 Member Features&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2F5496;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;fontStyle=1;arcSize=14;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="470" y="192" width="210" height="38" as="geometry" />
+        </mxCell>
+
+        <mxCell id="130" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="110" target="120"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="131" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="111" target="120"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="132" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="112" target="121"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="133" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="113" target="122"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="134" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="120" target="121"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="135" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="121" target="122"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ── Member Logic Layer ── -->
+        <mxCell id="103" value="LOGIC LAYER" style="text=;html=1;align=left;verticalAlign=middle;fontSize=9;fontStyle=1;fontColor=#4472C4;strokeColor=none;fillColor=none;spacingLeft=4;" parent="1" vertex="1">
+          <mxGeometry x="48" y="252" width="80" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="140" value="Member Cost Prediction&lt;br&gt;&lt;i&gt;(Risk Tier Assignment)&lt;/i&gt;&lt;br&gt;&lt;b&gt;CRITICAL | HIGH | ELEVATED | WATCH&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D26012;fontColor=#FFFFFF;strokeColor=#A04E0F;fontSize=11;fontStyle=0;arcSize=12;" parent="1" vertex="1">
+          <mxGeometry x="110" y="275" width="370" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="141" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="122" target="140"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="142" value="SHAP&lt;br&gt;Explainability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4472C4;fontColor=#FFFFFF;strokeColor=#2F5496;fontSize=10;fontStyle=1;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="540" y="280" width="145" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="143" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="140" target="142"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Member Risk Score Output -->
+        <mxCell id="150" value="&lt;b&gt;Member Risk&lt;br&gt;Score Table&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=12;fontStyle=0;arcSize=14;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="210" y="380" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="151" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="140" target="150"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="152" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="142" target="150"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Output summary -->
+        <mxCell id="153" value="&lt;i&gt;member_id | prob | predicted_spend | risk_tier | top_drivers&lt;/i&gt;" style="text=;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#888888;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="130" y="432" width="440" height="14" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!--     RIGHT BOX — PROVIDER RISK SCORING                     -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <mxCell id="200" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F0;strokeColor=#C0BCAA;strokeWidth=1.5;arcSize=2;" parent="1" vertex="1">
+          <mxGeometry x="770" y="70" width="700" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="201" value="PROVIDER RISK SCORING" style="text=;html=1;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#1B3A5C;strokeColor=none;fillColor=none;spacingLeft=8;" parent="1" vertex="1">
+          <mxGeometry x="778" y="74" width="260" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- ── Provider Data Layer ── -->
+        <mxCell id="202" value="DATA LAYER" style="text=;html=1;align=left;verticalAlign=middle;fontSize=9;fontStyle=1;fontColor=#4472C4;strokeColor=none;fillColor=none;spacingLeft=4;" parent="1" vertex="1">
+          <mxGeometry x="788" y="102" width="80" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="210" value="Provider&lt;br&gt;&lt;i&gt;NPI / Taxonomy&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="790" y="122" width="135" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="211" value="Claims History&lt;br&gt;&lt;i&gt;Per Provider&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="940" y="122" width="135" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="212" value="New Drug&lt;br&gt;&lt;i&gt;Formulary Data&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="1090" y="122" width="135" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="213" value="External Data&lt;br&gt;&lt;i&gt;Geo, Market&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=10;arcSize=30;" parent="1" vertex="1">
+          <mxGeometry x="1240" y="122" width="135" height="42" as="geometry" />
+        </mxCell>
+
+        <!-- Provider pipeline -->
+        <mxCell id="220" value="ETL &amp; Ingestion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4472C4;fontColor=#FFFFFF;strokeColor=#2F5496;fontSize=10;fontStyle=1;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="830" y="192" width="170" height="38" as="geometry" />
+        </mxCell>
+        <mxCell id="221" value="Provider&lt;br&gt;Feature Store" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2F5496;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;fontStyle=1;arcSize=14;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="1060" y="192" width="210" height="38" as="geometry" />
+        </mxCell>
+
+        <mxCell id="230" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="210" target="220"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="231" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="211" target="220"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="232" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="212" target="221"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="233" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=1.5;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="213" target="221"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="234" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="220" target="221"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ── Provider Logic Layer ── -->
+        <mxCell id="203" value="LOGIC LAYER" style="text=;html=1;align=left;verticalAlign=middle;fontSize=9;fontStyle=1;fontColor=#4472C4;strokeColor=none;fillColor=none;spacingLeft=4;" parent="1" vertex="1">
+          <mxGeometry x="788" y="252" width="80" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="240" value="Provider Clustering&lt;br&gt;&lt;i&gt;Geo, Specialty, Embeddings&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4472C4;fontColor=#FFFFFF;strokeColor=#2F5496;fontSize=10;fontStyle=1;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="810" y="275" width="220" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="241" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="221" target="240"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Member Score input arrow (cross-box) -->
+        <mxCell id="242" value="+ Member Scores" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#D26012;strokeWidth=2;endArrow=blockThin;endFill=1;dashed=1;fontSize=9;fontColor=#D26012;fontStyle=2;labelBackgroundColor=#FFFFFF;" parent="1" edge="1" source="150" target="240">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Admin/Coding Maturity Index -->
+        <mxCell id="250" value="Administrative / Coding&lt;br&gt;Maturity Index" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4472C4;fontColor=#FFFFFF;strokeColor=#2F5496;fontSize=10;fontStyle=1;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="1090" y="275" width="220" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="251" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="221" target="250"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Economic Performance Index -->
+        <mxCell id="260" value="Economic Performance Index&lt;br&gt;&lt;i&gt;Denial Ratio | 1st Pass Rate | Cost Efficiency&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D26012;fontColor=#FFFFFF;strokeColor=#A04E0F;fontSize=11;fontStyle=0;arcSize=12;" parent="1" vertex="1">
+          <mxGeometry x="870" y="350" width="380" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="261" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="240" target="260"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="262" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="250" target="260"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Provider Risk Score Output -->
+        <mxCell id="270" value="&lt;b&gt;Provider Risk&lt;br&gt;Score Table&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=12;fontStyle=0;arcSize=14;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="930" y="440" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="271" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="260" target="270"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="272" value="&lt;i&gt;provider_npi | cluster | econ_perf_idx | admin_maturity | risk_tier&lt;/i&gt;" style="text=;html=1;align=center;verticalAlign=middle;fontSize=8;fontColor=#888888;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="860" y="492" width="420" height="14" as="geometry" />
+        </mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!--         EARLY WARNING DASHBOARD                            -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <mxCell id="300" value="&lt;b&gt;Early Warning Intelligence Signal Dashboard&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1B3A5C;fontColor=#FFFFFF;strokeColor=#0D2137;fontSize=15;fontStyle=0;arcSize=8;shadow=1;" parent="1" vertex="1">
+          <mxGeometry x="370" y="630" width="760" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Both score tables → Dashboard -->
+        <mxCell id="301" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="150" target="300"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="302" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1B3A5C;strokeWidth=2;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="270" target="300"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!--          END USERS / USE CASES                             -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <mxCell id="400" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F4F8;strokeColor=#B4C7DC;strokeWidth=1;arcSize=3;" parent="1" vertex="1">
+          <mxGeometry x="30" y="725" width="1440" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="401" value="END USERS  /  USE CASES" style="text=;html=1;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#1B3A5C;strokeColor=none;fillColor=none;spacingLeft=6;" parent="1" vertex="1">
+          <mxGeometry x="38" y="728" width="220" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="410" value="Care&lt;br&gt;Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E75B6;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="55" y="758" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="411" value="Actuarial&lt;br&gt;Reserving" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E75B6;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="235" y="758" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="412" value="Stop-Loss&lt;br&gt;Pricing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E75B6;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="415" y="758" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="413" value="Provider&lt;br&gt;Network" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E75B6;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="595" y="758" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="414" value="Executive&lt;br&gt;Leadership" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E75B6;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="775" y="758" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="415" value="Underwriting&lt;br&gt;&amp; Compliance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E75B6;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="955" y="758" width="155" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="416" value="Contracting&lt;br&gt;&amp; Value-Based" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2E75B6;fontColor=#FFFFFF;strokeColor=#1B3A5C;fontSize=10;arcSize=14;" parent="1" vertex="1">
+          <mxGeometry x="1135" y="758" width="155" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- Dashboard → End Users -->
+        <mxCell id="420" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="300" target="410"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="421" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="300" target="411"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="422" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="300" target="412"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="423" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="300" target="413"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="424" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="300" target="414"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="425" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="300" target="415"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="426" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2E75B6;strokeWidth=1;dashed=1;endArrow=blockThin;endFill=1;" parent="1" edge="1" source="300" target="416"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Footer -->
+        <mxCell id="500" value="AEGIS  =  Advanced Early-warning Governance &amp;amp; Intelligence System  |  Platform for All Use Cases" style="text=;html=1;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#AAAAAA;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="350" y="840" width="800" height="16" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
