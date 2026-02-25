@@ -7,7 +7,7 @@ from pptx.oxml.ns import qn
 from lxml import etree
 import os
 
-OUT = r"D:\AI_Products_Dev\Products\AgenticAIClass_Docs\AEGIS_MemberRiskScoring_VP_CFO_Deck_v8.pptx"
+OUT = r"D:\AI_Products_Dev\Products\AgenticAIClass_Docs\AEGIS_MemberRiskScoring_VP_CFO_Deck_v9.pptx"
 
 NAVY     = RGBColor(0x1B, 0x3A, 0x5C)
 MED_BLUE = RGBColor(0x44, 0x72, 0xC4)
@@ -141,7 +141,7 @@ agenda_items = [
     ("03", "Three Compounding Problems", "Cost concentration, pricing gap, no early warning"),
     ("04", "Overall Objective", "AEGIS platform: Member + Provider risk scoring"),
     ("05", "Member Risk Scoring", "Two-stage ML pipeline, risk tiers, scale"),
-    ("06", "Provider Risk Scoring", "Clustering, Admin/Coding Index, Economic Index"),
+    ("06", "Provider Risk Scoring (PEPI)", "Administrative Yield: why similar care = different paid cost"),
     ("07", "End-to-End Architecture", "Data layers, logic layers, dashboard, end users"),
     ("08", "Timeline & Roadmap", "4 MVPs: Feb 2026 to Jun 2026"),
     ("09", "Expected Operational Impact", "MCR levers, efficiency, strategic advantage"),
@@ -485,11 +485,11 @@ col_data = [
         "Provide SHAP-based explainability (top cost drivers per member)",
         "Feed Care Management, Actuarial, and Stop-Loss teams weekly",
     ]),
-    ("Provider Risk Scoring", DARK_SL, [
-        "Cluster providers by geo, specialty, and practice embeddings",
-        "Compute Economic Performance Index (denial ratio, 1st-pass rate, cost efficiency)",
-        "Compute Administrative / Coding Maturity Index",
-        "Link member risk scores to provider panels (cross-input)",
+    ("Provider Risk Scoring  (PEPI)", DARK_SL, [
+        "Measure Administrative Yield: why similar care produces different paid costs",
+        "PEPI components: clean claim rate, denial rate, paid/allowed ratio, coding patterns",
+        "Member risk scores as input for case-mix adjusted peer comparison",
+        "Cluster providers into peer cohorts (geo, specialty, embeddings)",
         "Feed Network Management, Contracting, and Value-Based teams",
     ]),
 ]
@@ -582,58 +582,74 @@ for i, (val, label) in enumerate(metrics):
 add_footer(sl)
 
 # ══════════════════════════════════════════════════════════════
-# SLIDE 5 — PROVIDER RISK SCORING DEEP DIVE
+# SLIDE 5 — PROVIDER ECONOMIC PERFORMANCE INDEX (PEPI)
 # ══════════════════════════════════════════════════════════════
 sl = prs.slides.add_slide(prs.slide_layouts[6])
 add_header_bar(sl)
 add_text_box(sl, Inches(0.6), Inches(0.3), Inches(12), Inches(0.6),
-             "Provider Risk Scoring  —  Approach & Indices", size=28, color=NAVY, bold=True)
+             "Provider Economic Performance Index  (PEPI)", size=26, color=NAVY, bold=True)
 
-# Three columns for the three components
-components = [
-    ("Provider Clustering", NAVY, [
-        "Group 1.2M+ providers into peer cohorts",
-        "Features: geo (lat/lon), specialty, payer mix, case mix, volume",
-        "Method: UMAP + HDBSCAN embeddings",
-        "Output: Peer groups for fair comparison",
-        "Example: Urban Cardiologists, Rural PCPs, Academic Oncologists",
+add_text_box(sl, Inches(0.6), Inches(0.85), Inches(12), Inches(0.7),
+             "Why do two providers delivering similar care to similar patients produce very different paid costs?\n"
+             "PEPI is a structured measure of how providers convert care into paid dollars — the Administrative Yield.",
+             size=13, color=BLACK)
+
+# Input flow bar
+add_rect(sl, Inches(0.5), Inches(1.65), Inches(12.3), Inches(0.5), LIGHT_BG, STEEL)
+add_text_box(sl, Inches(0.7), Inches(1.67), Inches(11.9), Inches(0.45),
+             "Input:  Member Risk Scores (case-mix adjust)  \u2192  Compare providers treating equally sick patients on a level playing field",
+             size=11, color=NAVY, bold=True, align=PP_ALIGN.CENTER)
+
+# Four PEPI component columns
+pepi_cols = [
+    ("Claims Efficiency", NAVY, [
+        ("Clean Claim Rate", "% accepted on 1st submit"),
+        ("Denial Rate", "% denied by payer"),
+        ("Denial Overturn Rate", "% of denials won on appeal"),
+        ("Resubmission Freq", "How often claims resubmitted"),
+        ("Adjustment Counts", "Post-payment adjustments/claim"),
     ]),
-    ("Admin / Coding\nMaturity Index", DARK_SL, [
-        "First-Pass Claim Rate (30% weight)",
-        "Denial Rate inverse (25% weight)",
-        "Coding Specificity Score (20% weight)",
-        "Avg Days to Submit inverse (15% weight)",
-        "Rework Rate inverse (10% weight)",
-        "Output: 0-100 composite score",
+    ("Payment Dynamics", DARK_SL, [
+        ("Paid / Allowed Ratio", "Actual paid vs allowed amount"),
+        ("Paid per Unit", "Avg reimbursement per service"),
+        ("Days to Final Payment", "Submission to settlement time"),
     ]),
-    ("Economic\nPerformance Index", ACCENT, [
-        "Risk-Adjusted Cost Index / O:E (35%)",
-        "First-Pass Rate (15%)",
-        "Denial Rate inverse (15%)",
-        "Network Leakage inverse (10%)",
-        "Readmission Rate inverse (10%)",
-        "Cost Trend inverse (10%)",
-        "Total Cost of Care PMPY (5%)",
+    ("Billing Behavior", RGBColor(0x2E, 0x75, 0xB6), [
+        ("Billing Predictability", "Variance in billing patterns"),
+        ("Coding Practices", "Upcoding, modifier usage, E&M"),
+        ("Service Expansion", "New CPTs, volume shifts"),
+    ]),
+    ("External Signals", ACCENT, [
+        ("Market / News", "M&A, ownership changes"),
+        ("Regulatory Actions", "Compliance flags, audits"),
     ]),
 ]
 
-for i, (title, bg, items) in enumerate(components):
-    cx = Inches(0.5 + i * 4.2)
-    add_rect(sl, cx, Inches(1.2), Inches(3.9), Inches(0.65), bg)
-    add_text_box(sl, cx + Inches(0.1), Inches(1.22), Inches(3.7), Inches(0.6),
-                 title, size=14, color=WHITE, bold=True, align=PP_ALIGN.CENTER)
-    add_bullet_list(sl, cx + Inches(0.15), Inches(2.0), Inches(3.6), Inches(3.5),
-                    [f"\u2022  {it}" for it in items], size=11, color=BLACK, spacing=Pt(4))
+col_w = Inches(3.0)
+for i, (cat_title, bg, metrics) in enumerate(pepi_cols):
+    cx = Inches(0.4 + i * 3.15)
+    add_rect(sl, cx, Inches(2.35), col_w, Inches(0.5), bg)
+    add_text_box(sl, cx + Inches(0.05), Inches(2.37), col_w - Inches(0.1), Inches(0.45),
+                 cat_title, size=12, color=WHITE, bold=True, align=PP_ALIGN.CENTER)
 
-# Cross-input callout
-add_rect(sl, Inches(0.5), Inches(5.6), Inches(12.3), Inches(0.55), LIGHT_BG, STEEL)
-add_text_box(sl, Inches(0.7), Inches(5.62), Inches(11.9), Inches(0.5),
-             "Cross-Input:  Member Risk Scores flow INTO Provider Scoring  \u2192  % of panel flagged CRITICAL/HIGH + avg member risk score per provider",
-             size=12, color=NAVY, bold=True, align=PP_ALIGN.CENTER)
+    for j, (metric, desc) in enumerate(metrics):
+        my = Inches(2.95 + j * 0.48)
+        row_bg = LIGHT_BG if j % 2 == 0 else WHITE
+        add_rect(sl, cx, my, col_w, Inches(0.44), row_bg)
+        add_text_box(sl, cx + Inches(0.08), my + Inches(0.02), col_w - Inches(0.15), Inches(0.22),
+                     metric, size=10, color=NAVY, bold=True)
+        add_text_box(sl, cx + Inches(0.08), my + Inches(0.22), col_w - Inches(0.15), Inches(0.2),
+                     desc, size=8, color=GRAY)
+
+# PEPI output bar
+add_rect(sl, Inches(0.5), Inches(5.45), Inches(12.3), Inches(0.55), NAVY)
+add_text_box(sl, Inches(0.7), Inches(5.47), Inches(11.9), Inches(0.5),
+             "PEPI Score  =  Administrative Yield  \u2192  Explains cost increase WITHOUT utilization growth",
+             size=13, color=WHITE, bold=True, align=PP_ALIGN.CENTER)
 
 # Provider tiers
-add_text_box(sl, Inches(0.6), Inches(6.3), Inches(3), Inches(0.4),
-             "Provider Risk Tiers:", size=14, color=NAVY, bold=True)
+add_text_box(sl, Inches(0.6), Inches(6.15), Inches(3), Inches(0.35),
+             "Provider PEPI Tiers:", size=13, color=NAVY, bold=True)
 ptiers = [
     ("TOP PERFORMER", "> 80", GREEN),
     ("STANDARD", "60-80", MED_BLUE),
@@ -642,9 +658,15 @@ ptiers = [
 ]
 for i, (name, score, clr) in enumerate(ptiers):
     px = Inches(3.8 + i * 2.4)
-    add_rect(sl, px, Inches(6.3), Inches(2.1), Inches(0.42), clr)
-    add_text_box(sl, px + Inches(0.05), Inches(6.32), Inches(2.0), Inches(0.38),
-                 f"{name}  ({score})", size=11, color=WHITE, bold=True, align=PP_ALIGN.CENTER)
+    add_rect(sl, px, Inches(6.15), Inches(2.1), Inches(0.38), clr)
+    add_text_box(sl, px + Inches(0.05), Inches(6.17), Inches(2.0), Inches(0.34),
+                 f"{name}  ({score})", size=10, color=WHITE, bold=True, align=PP_ALIGN.CENTER)
+
+# Peer comparison callout
+add_rect(sl, Inches(0.5), Inches(6.65), Inches(12.3), Inches(0.4), LIGHT_BG, STEEL)
+add_text_box(sl, Inches(0.7), Inches(6.67), Inches(11.9), Inches(0.36),
+             "Peer Comparison:  Providers grouped by geo + specialty + case-mix (UMAP + HDBSCAN)  \u2192  PEPI scored within peer cohort for fair ranking",
+             size=10, color=NAVY, bold=True, align=PP_ALIGN.CENTER)
 
 add_footer(sl)
 
@@ -816,7 +838,7 @@ impact_cols = [
     ]),
     ("Strategic\nAdvantage", ACCENT, [
         "First-mover predictive platform across 50M+ members",
-        "Provider risk scoring creates leverage for network negotiations",
+        "PEPI (Administrative Yield) creates leverage for network negotiations",
         "SHAP explainability builds regulator and clinician trust",
         "Scalable framework: add new use cases (readmission, Rx adherence)",
         "Positions UHC to meet 2026 MCR guidance of 88.8%",
