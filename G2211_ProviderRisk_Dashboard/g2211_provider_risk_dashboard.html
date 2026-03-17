@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G2211 Provider Profiling &amp; Concentration Risk</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f1f5f9;--white:#ffffff;--card:#ffffff;--border:#e2e8f0;
+  --blue:#2563eb;--blue-light:#dbeafe;--blue-dark:#1e40af;
+  --orange:#f97316;--orange-light:#fff7ed;--orange-dark:#c2410c;
+  --text:#0f172a;--muted:#64748b;--light:#94a3b8;
+  --green:#16a34a;--red:#dc2626;--amber:#d97706;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+  --font:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);}
+.header{background:var(--white);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--blue);box-shadow:var(--shadow)}
+.header h1{font-size:22px;font-weight:700;color:var(--text)}
+.header h1 span{color:var(--blue)}
+.header .sub{color:var(--muted);font-size:12px;font-family:var(--mono)}
+.filters{display:flex;gap:12px;padding:14px 32px;background:var(--white);border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:flex-end}
+.filters .fg{display:flex;flex-direction:column;gap:3px}
+.filters label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;font-weight:700}
+.filters select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-family:var(--font);font-size:13px;cursor:pointer;outline:none;min-width:140px}
+.filters select:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-light)}
+.wrap{padding:18px 32px;display:flex;flex-direction:column;gap:16px}
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi:nth-child(1)::after{background:var(--blue)} .kpi:nth-child(2)::after{background:var(--orange)}
+.kpi:nth-child(3)::after{background:var(--green)} .kpi:nth-child(4)::after{background:var(--red)}
+.kpi:nth-child(5)::after{background:var(--amber)} .kpi:nth-child(6)::after{background:#7c3aed}
+.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-bottom:4px}
+.kpi .val{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--text)}
+.kpi .sub{font-size:11px;margin-top:3px;font-weight:500}
+.row{display:grid;gap:16px}
+.r2c{grid-template-columns:3fr 2fr}
+.r2e{grid-template-columns:1fr 1fr}
+.r2f{grid-template-columns:2fr 3fr}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;box-shadow:var(--shadow);min-height:340px}
+.ptitle{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ptitle .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.legend{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:500}
+.legend-item .sw{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.tip{position:fixed;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;pointer-events:none;z-index:999;box-shadow:var(--shadow-md);max-width:260px;opacity:0;transition:opacity .12s}
+.tip b{color:var(--blue)} .tip .tr{display:flex;justify-content:space-between;gap:14px;margin-top:2px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--mono)}
+.tag-g{background:#dcfce7;color:#16a34a} .tag-r{background:#fef2f2;color:#dc2626} .tag-o{background:#fff7ed;color:#ea580c}
+svg text{font-family:var(--font)}
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)} .r2c,.r2e,.r2f{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>G2211 <span>Provider Profiling</span> &amp; Concentration Risk</h1>
+    <div class="sub">CPT G2211 Visit Complexity Add-On | Medicare &amp; Medicaid | Actuarial Deep Dive</div>
+  </div>
+  <div class="sub">Synthetic Demo &middot; Mar 2026</div>
+</div>
+
+<div class="filters" id="filters">
+  <div class="fg"><label>State</label><select id="fSt"><option value="ALL">All States</option></select></div>
+  <div class="fg"><label>Specialty</label><select id="fSp"><option value="ALL">All Specialties</option></select></div>
+  <div class="fg"><label>Payer</label><select id="fPy"><option value="ALL">All Payers</option><option value="Medicare">Medicare</option><option value="Medicaid">Medicaid</option></select></div>
+  <div class="fg"><label>Year</label><select id="fYr"><option value="ALL">All Years</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option></select></div>
+</div>
+
+<div class="wrap">
+  <div class="kpi-row" id="kpis"></div>
+  <div class="row r2c">
+    <div class="panel"><div class="ptitle"><div class="dot" style="background:var(--blue)"></div>G2211 Spend by State</div><div id="mapBox"></div></div>
+    <div class="panel"><div class="ptitle"><div class="dot" style="background:var(--orange)"></div>Provider Concentration (Pareto)</div><svg id="paretoSvg"></svg></div>
+  </div>
+  <div class="row r2e">
+    <div class="panel"><div class="ptitle"><div class="dot" style="background:var(--red)"></div>Provider Outlier Detection</div><svg id="scatterSvg"></svg></div>
+    <div class="panel"><div class="ptitle"><div class="dot" style="background:var(--amber)"></div>Specialty &times; State Heatmap</div><svg id="heatSvg"></svg></div>
+  </div>
+  <div class="row r2f">
+    <div class="panel"><div class="ptitle"><div class="dot" style="background:var(--green)"></div>Payer Denial Analysis</div><div style="position:relative;height:270px"><canvas id="payerCanvas"></canvas></div><div class="legend" id="payerLeg"></div></div>
+    <div class="panel"><div class="ptitle"><div class="dot" style="background:#7c3aed"></div>Monthly Utilization Trend</div><div style="position:relative;height:300px"><canvas id="trendCanvas"></canvas></div></div>
+  </div>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+/* === PRNG === */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296;};}
+var R=mulberry32(42);
+function ri(a,b){return Math.floor(R()*(b-a+1))+a;}
+function pk(a){return a[ri(0,a.length-1)];}
+
+/* === CONFIG === */
+var STATES=[
+  {s:'CA',f:'06',z:'9'},{s:'TX',f:'48',z:'7'},{s:'FL',f:'12',z:'3'},
+  {s:'NY',f:'36',z:'1'},{s:'IL',f:'17',z:'6'},{s:'PA',f:'42',z:'1'},
+  {s:'OH',f:'39',z:'4'},{s:'GA',f:'13',z:'3'},{s:'NC',f:'37',z:'2'},
+  {s:'MI',f:'26',z:'4'},{s:'NJ',f:'34',z:'0'},{s:'VA',f:'51',z:'2'},
+  {s:'WA',f:'53',z:'9'},{s:'AZ',f:'04',z:'8'},{s:'MA',f:'25',z:'0'},
+  {s:'TN',f:'47',z:'3'},{s:'IN',f:'18',z:'4'},{s:'MO',f:'29',z:'6'},
+  {s:'MD',f:'24',z:'2'},{s:'WI',f:'55',z:'5'}
+];
+var SPECS=[
+  {n:'Family Medicine',r:.22,w:18},{n:'Internal Medicine',r:.19,w:16},
+  {n:'Cardiology',r:.12,w:7},{n:'Endocrinology',r:.10,w:5},
+  {n:'Pulmonology',r:.09,w:5},{n:'Neurology',r:.08,w:5},
+  {n:'Rheumatology',r:.09,w:4},{n:'Gastroenterology',r:.07,w:5},
+  {n:'Nephrology',r:.08,w:4},{n:'Dermatology',r:.04,w:4},
+  {n:'Orthopedics',r:.03,w:4},{n:'Urology',r:.03,w:4},
+  {n:'Ophthalmology',r:.02,w:4},{n:'General Surgery',r:.015,w:4},
+  {n:'Anesthesiology',r:.005,w:3}
+];
+var DX=['E11.9','I10','J44.1','I50.9','N18.3','E78.5','G43.909','M54.5','F41.1','J06.9'];
+var EM=['99202','99203','99204','99205','99211','99212','99213','99214','99215'];
+var EMCOST={99202:75,99203:110,99204:165,99205:215,99211:25,99212:50,99213:98,99214:145,99215:210};
+var G_PAY=16.50;
+var MCD_STATES=['CA','NY','MA','WA','IL','PA','NJ','MD','WI','MI'];
+
+/* === PROVIDERS === */
+var provs=[];
+var pid=1000;
+SPECS.forEach(function(sp){
+  var n=Math.max(3,Math.round(sp.w*0.55));
+  for(var i=0;i<n;i++){
+    var st=pk(STATES);
+    provs.push({npi:'NPI'+(pid++),spec:sp.n,state:st.s,fips:st.f,
+      zip:st.z+String(ri(1000,9999)),rate:sp.r,outlier:false});
+  }
+});
+provs[0].rate=0.62;provs[0].outlier=true;
+provs[1].rate=0.58;provs[1].outlier=true;
+provs[3].rate=0.51;provs[3].outlier=true;
+
+/* === CLAIMS === */
+var claims=[];
+var d0=new Date(2024,0,1).getTime();
+var d1=new Date(2026,1,28).getTime();
+var span=Math.floor((d1-d0)/86400000);
+
+for(var i=0;i<12000;i++){
+  var pv=pk(provs);
+  var off=ri(0,span);
+  var dos=new Date(d0+off*86400000);
+  var yr=dos.getFullYear();
+  var mo=dos.getMonth()+1;
+  var mk=yr+'-'+(mo<10?'0':'')+mo;
+  var payer=R()<0.58?'Medicare':'Medicaid';
+  var tf=Math.min(1,(off/span)*1.8);
+  var er=pv.rate*(0.3+0.7*tf);
+  if(payer==='Medicaid'&&MCD_STATES.indexOf(pv.state)<0) er*=0.15;
+  var em=pk(EM);
+  var hasG=R()<er;
+  var base=EMCOST[em]*(payer==='Medicaid'?0.72:1)*(0.9+R()*0.2);
+  var gAmt=0,denied=false;
+  if(hasG){
+    gAmt=payer==='Medicare'?G_PAY*(0.92+R()*0.16):(MCD_STATES.indexOf(pv.state)>=0?12+R()*4:10+R()*3);
+    var dr=payer==='Medicare'?0.06:(MCD_STATES.indexOf(pv.state)>=0?0.18:0.45);
+    denied=R()<dr;
+  }
+  var m25=hasG&&R()<0.15?'25':'';
+  claims.push({npi:pv.npi,spec:pv.spec,state:pv.state,fips:pv.fips,
+    payer:payer,em:em,hasG:hasG,gAmt:denied?0:gAmt,
+    base:Math.round(base*100)/100,denied:denied,
+    yr:yr,mo:mo,mk:mk,m25:m25,dx:pk(DX),
+    total:Math.round((base+(denied?0:gAmt))*100)/100});
+}
+
+/* === HELPERS === */
+var fmt=function(n){return n.toLocaleString('en-US');};
+var fD=function(n){return '$'+Math.round(n).toLocaleString('en-US');};
+var fP=function(n){return(n*100).toFixed(1)+'%';};
+var tip=document.getElementById('tip');
+function showTip(ev,html){tip.innerHTML=html;tip.style.opacity='1';tip.style.left=(ev.clientX+14)+'px';tip.style.top=(ev.clientY-10)+'px';}
+function hideTip(){tip.style.opacity='0';}
+
+/* === FILTERS === */
+var allStates=[]; var allSpecs=[];
+claims.forEach(function(c){
+  if(allStates.indexOf(c.state)<0)allStates.push(c.state);
+  if(allSpecs.indexOf(c.spec)<0)allSpecs.push(c.spec);
+});
+allStates.sort();allSpecs.sort();
+allStates.forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=s;document.getElementById('fSt').appendChild(o);});
+allSpecs.forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=s;document.getElementById('fSp').appendChild(o);});
+
+function getFiltered(){
+  var d=claims;
+  var sv=document.getElementById('fSt').value;
+  var sp=document.getElementById('fSp').value;
+  var py=document.getElementById('fPy').value;
+  var yr=document.getElementById('fYr').value;
+  if(sv!=='ALL') d=d.filter(function(c){return c.state===sv;});
+  if(sp!=='ALL') d=d.filter(function(c){return c.spec===sp;});
+  if(py!=='ALL') d=d.filter(function(c){return c.payer===py;});
+  if(yr!=='ALL') d=d.filter(function(c){return c.yr===parseInt(yr);});
+  return d;
+}
+
+/* === CHART INSTANCES === */
+var chartPayer=null;
+var chartTrend=null;
+
+/* === RENDER === */
+function renderAll(){
+  var data=getFiltered();
+  renderKPIs(data);
+  renderMap(data);
+  renderPareto(data);
+  renderScatter(data);
+  renderHeat(data);
+  renderPayer(data);
+  renderTrend(data);
+}
+
+/* --- KPIs --- */
+function renderKPIs(data){
+  var g=data.filter(function(c){return c.hasG;});
+  var total=data.length;
+  var gCnt=g.length;
+  var aRate=total>0?gCnt/total:0;
+  var gSpend=0; g.forEach(function(c){gSpend+=c.gAmt;});
+  var denCnt=data.filter(function(c){return c.hasG&&c.denied;}).length;
+  var denRate=(denCnt+gCnt)>0?denCnt/(denCnt+gCnt):0;
+
+  var provMap={};
+  data.forEach(function(c){
+    if(!provMap[c.npi])provMap[c.npi]={t:0,g:0};
+    provMap[c.npi].t++;
+    if(c.hasG)provMap[c.npi].g++;
+  });
+  var outliers=0;
+  Object.keys(provMap).forEach(function(k){
+    if(provMap[k].t>15&&provMap[k].g/provMap[k].t>0.4)outliers++;
+  });
+
+  var stMap={};
+  g.forEach(function(c){if(!stMap[c.state])stMap[c.state]=0;stMap[c.state]++;});
+  var topSt='—';var topN=0;
+  Object.keys(stMap).forEach(function(k){if(stMap[k]>topN){topN=stMap[k];topSt=k;}});
+
+  document.getElementById('kpis').innerHTML=
+    '<div class="kpi"><div class="lbl">Total Claims</div><div class="val">'+fmt(total)+'</div><div class="sub" style="color:var(--muted)">E/M base volume</div></div>'+
+    '<div class="kpi"><div class="lbl">G2211 Claims</div><div class="val">'+fmt(gCnt)+'</div><div class="sub" style="color:var(--orange)">'+fP(aRate)+' attachment rate</div></div>'+
+    '<div class="kpi"><div class="lbl">G2211 Spend</div><div class="val">'+fD(gSpend)+'</div><div class="sub" style="color:var(--green)">Incremental add-on</div></div>'+
+    '<div class="kpi"><div class="lbl">Denial Rate</div><div class="val">'+fP(denRate)+'</div><div class="sub" style="color:var(--red)">'+fmt(denCnt)+' denied</div></div>'+
+    '<div class="kpi"><div class="lbl">Outlier Providers</div><div class="val">'+outliers+'</div><div class="sub" style="color:'+(outliers>2?'var(--red)':'var(--green)')+'">Attach &gt;40%</div></div>'+
+    '<div class="kpi"><div class="lbl">Top State</div><div class="val">'+topSt+'</div><div class="sub" style="color:var(--muted)">'+fmt(topN)+' G2211 claims</div></div>';
+}
+
+/* --- MAP --- */
+var usData=null;
+function renderMap(data){
+  var box=document.getElementById('mapBox');
+  box.innerHTML='';
+  var gClaims=data.filter(function(c){return c.hasG&&!c.denied;});
+  var stSpend={};
+  gClaims.forEach(function(c){if(!stSpend[c.fips])stSpend[c.fips]=0;stSpend[c.fips]+=c.gAmt;});
+  var maxS=0;
+  Object.keys(stSpend).forEach(function(k){if(stSpend[k]>maxS)maxS=stSpend[k];});
+  if(maxS===0)maxS=1;
+
+  var w=box.clientWidth||540;
+  var h=320;
+  var svg=d3.select(box).append('svg').attr('width',w).attr('height',h);
+  var proj=d3.geoAlbersUsa().fitSize([w,h-30],{type:'Sphere'});
+  var path=d3.geoPath().projection(proj);
+  var color=d3.scaleSequential(d3.interpolateBlues).domain([0,maxS]);
+
+  function draw(us){
+    var states=topojson.feature(us,us.objects.states);
+    svg.selectAll('path').data(states.features).join('path')
+      .attr('d',path)
+      .attr('fill',function(d){var v=stSpend[d.id];return v?color(v):'#f1f5f9';})
+      .attr('stroke','#cbd5e1').attr('stroke-width',0.5)
+      .on('mousemove',function(ev,d){
+        var v=stSpend[d.id]||0;
+        var so=STATES.filter(function(x){return x.f===d.id;})[0];
+        var sn=so?so.s:d.id;
+        var sc=gClaims.filter(function(c){return c.fips===d.id;}).length;
+        showTip(ev,'<b>'+sn+'</b><div class="tr"><span>G2211 Spend</span><span>'+fD(v)+'</span></div><div class="tr"><span>Claims</span><span>'+fmt(sc)+'</span></div>');
+      })
+      .on('mouseleave',hideTip);
+
+    var lw=180;
+    var lg=svg.append('g').attr('transform','translate('+(w-lw-16)+','+(h-22)+')');
+    var defs=svg.append('defs');
+    var grad=defs.append('linearGradient').attr('id','mg');
+    grad.append('stop').attr('offset','0%').attr('stop-color',color(0));
+    grad.append('stop').attr('offset','100%').attr('stop-color',color(maxS));
+    lg.append('rect').attr('width',lw).attr('height',8).attr('rx',4).style('fill','url(#mg)');
+    lg.append('text').attr('y',18).attr('font-size',9).attr('fill','#64748b').text('$0');
+    lg.append('text').attr('x',lw).attr('y',18).attr('text-anchor','end').attr('font-size',9).attr('fill','#64748b').text(fD(maxS));
+  }
+
+  if(usData){draw(usData);}
+  else{d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(function(us){usData=us;draw(us);});}
+}
+
+/* --- PARETO --- */
+function renderPareto(data){
+  var el=document.getElementById('paretoSvg');
+  var pw=el.parentNode.clientWidth-40;
+  var ph=280;
+  d3.select(el).selectAll('*').remove();
+  d3.select(el).attr('width',pw).attr('height',ph);
+
+  var gClaims=data.filter(function(c){return c.hasG&&!c.denied;});
+  var provMap={};
+  gClaims.forEach(function(c){
+    if(!provMap[c.npi])provMap[c.npi]={cnt:0,spend:0};
+    provMap[c.npi].cnt++;provMap[c.npi].spend+=c.gAmt;
+  });
+  var arr=Object.keys(provMap).map(function(k){return{npi:k,cnt:provMap[k].cnt,spend:provMap[k].spend};});
+  arr.sort(function(a,b){return b.spend-a.spend;});
+  arr=arr.slice(0,25);
+  var totS=0;arr.forEach(function(d){totS+=d.spend;});
+  var cum=0;
+  arr.forEach(function(d){cum+=d.spend;d.cumPct=totS>0?cum/totS:0;});
+
+  var m={t:10,r:42,b:50,l:50};
+  var svg=d3.select(el);
+  var x=d3.scaleBand().domain(arr.map(function(d){return d.npi;})).range([m.l,pw-m.r]).padding(0.3);
+  var y=d3.scaleLinear().domain([0,d3.max(arr,function(d){return d.spend;})||1]).range([ph-m.b,m.t]);
+  var y2=d3.scaleLinear().domain([0,1]).range([ph-m.b,m.t]);
+
+  svg.append('g').attr('transform','translate(0,'+(ph-m.b)+')').call(d3.axisBottom(x).tickSize(0))
+    .selectAll('text').attr('font-size',7).attr('fill','#94a3b8').attr('transform','rotate(-45)').attr('text-anchor','end');
+  svg.append('g').attr('transform','translate('+m.l+',0)').call(d3.axisLeft(y).ticks(5).tickFormat(function(d){return '$'+d3.format('.2s')(d);}))
+    .selectAll('text').attr('font-size',9).attr('fill','#64748b');
+
+  svg.selectAll('.bar').data(arr).join('rect').attr('class','bar')
+    .attr('x',function(d){return x(d.npi);}).attr('y',function(d){return y(d.spend);})
+    .attr('width',x.bandwidth()).attr('height',function(d){return ph-m.b-y(d.spend);})
+    .attr('fill','#2563eb').attr('rx',2).attr('opacity',0.8)
+    .on('mousemove',function(ev,d){showTip(ev,'<b>'+d.npi+'</b><div class="tr"><span>Spend</span><span>'+fD(d.spend)+'</span></div><div class="tr"><span>Claims</span><span>'+fmt(d.cnt)+'</span></div><div class="tr"><span>Cum %</span><span>'+fP(d.cumPct)+'</span></div>');})
+    .on('mouseleave',hideTip);
+
+  var line=d3.line().x(function(d){return x(d.npi)+x.bandwidth()/2;}).y(function(d){return y2(d.cumPct);}).curve(d3.curveMonotoneX);
+  svg.append('path').datum(arr).attr('d',line).attr('fill','none').attr('stroke','#f97316').attr('stroke-width',2.5);
+  svg.selectAll('.cdot').data(arr).join('circle').attr('class','cdot')
+    .attr('cx',function(d){return x(d.npi)+x.bandwidth()/2;}).attr('cy',function(d){return y2(d.cumPct);})
+    .attr('r',3).attr('fill','#f97316');
+
+  svg.append('g').attr('transform','translate('+(pw-m.r)+',0)').call(d3.axisRight(y2).ticks(5).tickFormat(d3.format('.0%')))
+    .selectAll('text').attr('font-size',9).attr('fill','#f97316');
+
+  svg.append('line').attr('x1',m.l).attr('x2',pw-m.r).attr('y1',y2(0.8)).attr('y2',y2(0.8))
+    .attr('stroke','#dc2626').attr('stroke-dasharray','5,3').attr('opacity',0.6);
+  svg.append('text').attr('x',m.l+4).attr('y',y2(0.8)-5).attr('font-size',9).attr('fill','#dc2626').text('80% threshold');
+}
+
+/* --- SCATTER --- */
+function renderScatter(data){
+  var el=document.getElementById('scatterSvg');
+  var sw=el.parentNode.clientWidth-40;
+  var sh=290;
+  d3.select(el).selectAll('*').remove();
+  d3.select(el).attr('width',sw).attr('height',sh);
+
+  var provMap={};
+  data.forEach(function(c){
+    if(!provMap[c.npi])provMap[c.npi]={t:0,g:0,spend:0,spec:c.spec,state:c.state};
+    provMap[c.npi].t++;
+    if(c.hasG){provMap[c.npi].g++;if(!c.denied)provMap[c.npi].spend+=c.gAmt;}
+  });
+  var arr=Object.keys(provMap).map(function(k){var p=provMap[k];return{npi:k,t:p.t,g:p.g,spend:p.spend,spec:p.spec,state:p.state,rate:p.t>0?p.g/p.t:0};});
+
+  var m={t:10,r:16,b:38,l:48};
+  var svg=d3.select(el);
+  var xMax=d3.max(arr,function(d){return d.t;})*1.05||100;
+  var yMax=Math.min(1,d3.max(arr,function(d){return d.rate;})*1.15)||0.5;
+  var x=d3.scaleLinear().domain([0,xMax]).range([m.l,sw-m.r]);
+  var y=d3.scaleLinear().domain([0,yMax]).range([sh-m.b,m.t]);
+  var r=d3.scaleSqrt().domain([0,d3.max(arr,function(d){return d.spend;})||1]).range([3,16]);
+  var specCol=d3.scaleOrdinal().domain(allSpecs).range(['#2563eb','#f97316','#16a34a','#dc2626','#7c3aed','#0891b2','#d97706','#be185d','#4f46e5','#059669','#e11d48','#0284c7','#ca8a04','#9333ea','#64748b']);
+
+  svg.append('g').attr('transform','translate(0,'+(sh-m.b)+')').call(d3.axisBottom(x).ticks(6))
+    .selectAll('text').attr('font-size',9).attr('fill','#64748b');
+  svg.append('g').attr('transform','translate('+m.l+',0)').call(d3.axisLeft(y).ticks(6).tickFormat(d3.format('.0%')))
+    .selectAll('text').attr('font-size',9).attr('fill','#64748b');
+
+  if(y(0.4)>m.t){
+    svg.append('rect').attr('x',m.l).attr('y',m.t).attr('width',sw-m.l-m.r).attr('height',y(0.4)-m.t)
+      .attr('fill','#dc2626').attr('opacity',0.06);
+    svg.append('line').attr('x1',m.l).attr('x2',sw-m.r).attr('y1',y(0.4)).attr('y2',y(0.4))
+      .attr('stroke','#dc2626').attr('stroke-dasharray','4,3').attr('opacity',0.5);
+    svg.append('text').attr('x',sw-m.r-4).attr('y',y(0.4)+14).attr('text-anchor','end')
+      .attr('font-size',9).attr('fill','#dc2626').attr('font-weight',700).text('AUDIT RISK ZONE (>40%)');
+  }
+
+  svg.selectAll('circle').data(arr).join('circle')
+    .attr('cx',function(d){return x(d.t);}).attr('cy',function(d){return y(d.rate);})
+    .attr('r',function(d){return r(d.spend);})
+    .attr('fill',function(d){return specCol(d.spec);}).attr('opacity',0.65)
+    .attr('stroke',function(d){return d.rate>0.4?'#dc2626':'none';}).attr('stroke-width',2.5)
+    .on('mousemove',function(ev,d){
+      showTip(ev,'<b>'+d.npi+'</b> &middot; '+d.spec+
+        '<div class="tr"><span>State</span><span>'+d.state+'</span></div>'+
+        '<div class="tr"><span>Total E/M</span><span>'+fmt(d.t)+'</span></div>'+
+        '<div class="tr"><span>G2211</span><span>'+fmt(d.g)+'</span></div>'+
+        '<div class="tr"><span>Attach Rate</span><span>'+fP(d.rate)+'</span></div>'+
+        '<div class="tr"><span>G2211 Spend</span><span>'+fD(d.spend)+'</span></div>'+
+        (d.rate>0.4?'<div style="color:#dc2626;margin-top:4px;font-weight:700">OUTLIER FLAG</div>':''));
+    })
+    .on('mouseleave',hideTip);
+
+  svg.append('text').attr('x',sw/2).attr('y',sh-4).attr('text-anchor','middle').attr('font-size',10).attr('fill','#64748b').text('Total E/M Volume');
+  svg.append('text').attr('transform','translate(13,'+(sh/2)+') rotate(-90)').attr('text-anchor','middle').attr('font-size',10).attr('fill','#64748b').text('G2211 Attachment Rate');
+}
+
+/* --- HEATMAP --- */
+function renderHeat(data){
+  var el=document.getElementById('heatSvg');
+  var hw=el.parentNode.clientWidth-40;
+  var hh=290;
+  d3.select(el).selectAll('*').remove();
+  d3.select(el).attr('width',hw).attr('height',hh);
+
+  var topSpecs=SPECS.slice(0,10).map(function(s){return s.n;});
+  var stCounts={};
+  data.forEach(function(c){stCounts[c.state]=(stCounts[c.state]||0)+1;});
+  var topSt=Object.keys(stCounts).sort(function(a,b){return stCounts[b]-stCounts[a];}).slice(0,12);
+
+  var mat=[];
+  topSpecs.forEach(function(sp){
+    topSt.forEach(function(st){
+      var sub=data.filter(function(c){return c.spec===sp&&c.state===st;});
+      var rate=sub.length>0?sub.filter(function(c){return c.hasG;}).length/sub.length:0;
+      mat.push({spec:sp,state:st,rate:rate});
+    });
+  });
+
+  var m={t:5,r:10,b:24,l:120};
+  var svg=d3.select(el);
+  var x=d3.scaleBand().domain(topSt).range([m.l,hw-m.r]).padding(0.06);
+  var y=d3.scaleBand().domain(topSpecs).range([m.t,hh-m.b]).padding(0.06);
+  var maxR=d3.max(mat,function(d){return d.rate;})||0.3;
+  var color=d3.scaleSequential(d3.interpolateOranges).domain([0,maxR]);
+
+  svg.append('g').attr('transform','translate(0,'+(hh-m.b)+')').call(d3.axisBottom(x).tickSize(0))
+    .selectAll('text').attr('font-size',9).attr('fill','#64748b');
+  svg.append('g').attr('transform','translate('+m.l+',0)').call(d3.axisLeft(y).tickSize(0))
+    .selectAll('text').attr('font-size',9).attr('fill','#64748b');
+
+  svg.selectAll('.hcell').data(mat).join('rect').attr('class','hcell')
+    .attr('x',function(d){return x(d.state);}).attr('y',function(d){return y(d.spec);})
+    .attr('width',x.bandwidth()).attr('height',y.bandwidth())
+    .attr('fill',function(d){return d.rate>0?color(d.rate):'#f8fafc';}).attr('rx',3)
+    .on('mousemove',function(ev,d){showTip(ev,'<b>'+d.spec+'</b> — '+d.state+'<div class="tr"><span>Attach Rate</span><span>'+fP(d.rate)+'</span></div>');})
+    .on('mouseleave',hideTip);
+
+  svg.selectAll('.htxt').data(mat.filter(function(d){return d.rate>0.01;})).join('text').attr('class','htxt')
+    .attr('x',function(d){return x(d.state)+x.bandwidth()/2;})
+    .attr('y',function(d){return y(d.spec)+y.bandwidth()/2+4;})
+    .attr('text-anchor','middle').attr('font-size',8)
+    .attr('fill',function(d){return d.rate>0.15?'#fff':'#64748b';})
+    .text(function(d){return fP(d.rate);});
+}
+
+/* --- PAYER DENIAL --- */
+function renderPayer(data){
+  var g=data.filter(function(c){return c.hasG;});
+  var payers=['Medicare','Medicaid'];
+  var paid=payers.map(function(p){return g.filter(function(c){return c.payer===p&&!c.denied;}).length;});
+  var denied=payers.map(function(p){return g.filter(function(c){return c.payer===p&&c.denied;}).length;});
+  var avgP=payers.map(function(p){
+    var v=g.filter(function(c){return c.payer===p&&!c.denied;});
+    if(v.length===0)return 0;
+    var s=0;v.forEach(function(c){s+=c.gAmt;});return s/v.length;
+  });
+
+  if(chartPayer){chartPayer.destroy();chartPayer=null;}
+  var ctx=document.getElementById('payerCanvas');
+  chartPayer=new Chart(ctx,{
+    type:'bar',
+    data:{labels:payers,datasets:[
+      {label:'Paid Claims',data:paid,backgroundColor:'#2563eb',borderRadius:4,barPercentage:0.6},
+      {label:'Denied Claims',data:denied,backgroundColor:'#dc2626',borderRadius:4,barPercentage:0.6}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#64748b',font:{family:'DM Sans',size:11}}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{family:'DM Sans'}},grid:{color:'#e2e8f022'}},
+        y:{ticks:{color:'#64748b',font:{family:'DM Sans'}},grid:{color:'#e2e8f0'}}
+      }
+    }
+  });
+
+  document.getElementById('payerLeg').innerHTML=payers.map(function(p,i){
+    var tot=paid[i]+denied[i];
+    var rate=tot>0?denied[i]/tot:0;
+    return '<div class="legend-item"><div class="sw" style="background:'+(i===0?'#2563eb':'#f97316')+'"></div>'+p+': <span class="tag '+(rate>0.2?'tag-r':'tag-g')+'">'+fP(rate)+' denial</span> &middot; Avg '+fD(avgP[i])+'/claim</div>';
+  }).join('');
+}
+
+/* --- TREND --- */
+function renderTrend(data){
+  var months=[];
+  data.forEach(function(c){if(months.indexOf(c.mk)<0)months.push(c.mk);});
+  months.sort();
+
+  var groups={
+    'Primary Care':['Family Medicine','Internal Medicine'],
+    'Medical Subspecialty':['Cardiology','Endocrinology','Pulmonology','Neurology','Rheumatology','Gastroenterology','Nephrology'],
+    'Surgical / Other':['Dermatology','Orthopedics','Urology','Ophthalmology','General Surgery','Anesthesiology']
+  };
+  var colors=['#2563eb','#f97316','#64748b'];
+  var datasets=Object.keys(groups).map(function(label,i){
+    var specs=groups[label];
+    var vals=months.map(function(m){
+      var sub=data.filter(function(c){return c.mk===m&&specs.indexOf(c.spec)>=0;});
+      return sub.length>0?+(sub.filter(function(c){return c.hasG;}).length/sub.length*100).toFixed(2):0;
+    });
+    return {label:label,data:vals,borderColor:colors[i],backgroundColor:colors[i]+'18',tension:0.4,pointRadius:1.5,borderWidth:2.5,fill:false};
+  });
+
+  if(chartTrend){chartTrend.destroy();chartTrend=null;}
+  var ctx2=document.getElementById('trendCanvas');
+  chartTrend=new Chart(ctx2,{
+    type:'line',
+    data:{labels:months,datasets:datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#64748b',font:{family:'DM Sans',size:11}}}},
+      scales:{
+        x:{ticks:{color:'#64748b',font:{family:'DM Sans',size:9},maxRotation:45},grid:{color:'#e2e8f0'}},
+        y:{title:{display:true,text:'Attachment Rate %',color:'#64748b',font:{family:'DM Sans'}},ticks:{color:'#64748b',font:{family:'DM Sans'}},grid:{color:'#e2e8f0'}}
+      }
+    }
+  });
+}
+
+/* === INIT === */
+document.getElementById('fSt').addEventListener('change',renderAll);
+document.getElementById('fSp').addEventListener('change',renderAll);
+document.getElementById('fPy').addEventListener('change',renderAll);
+document.getElementById('fYr').addEventListener('change',renderAll);
+renderAll();
+</script>
+</body>
+</html>
