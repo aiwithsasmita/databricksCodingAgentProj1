@@ -1,0 +1,16 @@
+# Foodly AI Support - Requirements
+# ================================
+
+# UI
+streamlit
+
+# Databricks SDK (for connecting to deployed endpoint)
+databricks-sdk
+
+# Agent Framework (needed for Databricks notebook execution)
+databricks-langchain
+langgraph
+mlflow[databricks]
+
+# LangChain core
+langchain-core

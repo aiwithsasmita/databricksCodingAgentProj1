@@ -1,0 +1,450 @@
+{
+  "source": "CMS web announcement: ICD-10 MS-DRGs V43.1 new ICD-10-PCS codes (April 2026)",
+  "effective_date": "2026-04-01",
+  "grouper_version": "ICD-10 MS-DRG V43.1",
+  "mce_version_note": "MCE V43.1: edits validate ICD-10 codes on claims for discharges on or after 2026-04-01",
+  "footnote_legend": {
+    "*": "Non-O.R. procedure: no assigned MDC/MS-DRG in the announcement table; grouper assignment depends on principal diagnosis, CC/MCC, procedures, age, sex, discharge status (CMS text).",
+    "**": "Non-O.R. procedure that may still affect MS-DRG assignment (CMS text)."
+  },
+  "resource_urls": {
+    "ms_drg_software": "https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/MS-DRG-Classifications-and-Software.html",
+    "icd_10_code_files": "https://www.cms.gov/medicare/coding-billing/icd-10-codes"
+  },
+  "count": 80,
+  "procedures": [
+    {
+      "pcs": "02HM3JZ",
+      "description": "Insertion of pacemaker lead into ventricular septum, percutaneous approach",
+      "cms_table_footnote": "**"
+    },
+    {
+      "pcs": "02HM3KZ",
+      "description": "Insertion of defibrillator lead into ventricular septum, percutaneous approach"
+    },
+    {
+      "pcs": "02HM3MZ",
+      "description": "Insertion of cardiac lead into ventricular septum, percutaneous approach",
+      "cms_table_footnote": "**"
+    },
+    {
+      "pcs": "02HM3NZ",
+      "description": "Insertion of intracardiac pacemaker into ventricular septum, percutaneous approach"
+    },
+    {
+      "pcs": "02HM3YZ",
+      "description": "Insertion of other device into ventricular septum, percutaneous approach"
+    },
+    {
+      "pcs": "0DDU0ZZ",
+      "description": "Extraction of omentum, open approach",
+      "or_procedure": "Y"
+    },
+    {
+      "pcs": "0DDU4ZZ",
+      "description": "Extraction of omentum, percutaneous endoscopic approach"
+    },
+    {
+      "pcs": "0DDV0ZZ",
+      "description": "Extraction of mesentery, open approach",
+      "or_procedure": "Y"
+    },
+    {
+      "pcs": "0DDV4ZZ",
+      "description": "Extraction of mesentery, percutaneous endoscopic approach"
+    },
+    {
+      "pcs": "0F9480D",
+      "description": "Drainage of gallbladder with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9480E",
+      "description": "Drainage of gallbladder with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9580D",
+      "description": "Drainage of right hepatic duct with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9580E",
+      "description": "Drainage of right hepatic duct with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9680D",
+      "description": "Drainage of left hepatic duct with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9680E",
+      "description": "Drainage of left hepatic duct with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9780D",
+      "description": "Drainage of common hepatic duct with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9780E",
+      "description": "Drainage of common hepatic duct with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9880D",
+      "description": "Drainage of cystic duct with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9880E",
+      "description": "Drainage of cystic duct with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9980D",
+      "description": "Drainage of common bile duct with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9980E",
+      "description": "Drainage of common bile duct with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9C80D",
+      "description": "Drainage of ampulla of vater with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9C80E",
+      "description": "Drainage of ampulla of vater with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9D80D",
+      "description": "Drainage of pancreatic duct with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9D80E",
+      "description": "Drainage of pancreatic duct with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9F80D",
+      "description": "Drainage of accessory pancreatic duct with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9F80E",
+      "description": "Drainage of accessory pancreatic duct with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9G80D",
+      "description": "Drainage of pancreas with drainage device, via natural or artificial opening endoscopic, transmural",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0F9G80E",
+      "description": "Drainage of pancreas with drainage device, via natural or artificial opening endoscopic, transpapillary",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "0TXB0Z6",
+      "description": "Transfer bladder to right ureter, open approach",
+      "or_procedure": "Y"
+    },
+    {
+      "pcs": "0TXB0Z7",
+      "description": "Transfer bladder to left ureter, open approach",
+      "or_procedure": "Y"
+    },
+    {
+      "pcs": "0TXB4Z6",
+      "description": "Transfer bladder to right ureter, percutaneous endoscopic approach"
+    },
+    {
+      "pcs": "0TXB4Z7",
+      "description": "Transfer bladder to left ureter, percutaneous endoscopic approach"
+    },
+    {
+      "pcs": "0VT00ZE",
+      "description": "Resection of prostate, open approach, capsule intact",
+      "or_procedure": "Y"
+    },
+    {
+      "pcs": "0VT04ZE",
+      "description": "Resection of prostate, percutaneous endoscopic approach, capsule intact"
+    },
+    {
+      "pcs": "0VT07ZE",
+      "description": "Resection of prostate, via natural or artificial opening, capsule intact"
+    },
+    {
+      "pcs": "0VT08ZE",
+      "description": "Resection of prostate, via natural or artificial opening endoscopic, capsule intact"
+    },
+    {
+      "pcs": "3E033AZ",
+      "description": "Introduction of embryonic stem cells into peripheral vein, percutaneous approach",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "3E043AZ",
+      "description": "Introduction of embryonic stem cells into central vein, percutaneous approach",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "4A0FXEJ",
+      "description": "Measurement of musculoskeletal body composition using air displacement plethysmography, external approach",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "5A0221E",
+      "description": "Assistance with cardiac output using blood flow modulator, continuous"
+    },
+    {
+      "pcs": "F07DYD0",
+      "description": "Electrotherapeutic treatment of integumentary system - head and neck using microcurrent stimulation",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F07EYD0",
+      "description": "Electrotherapeutic treatment of integumentary system - thorax / abdomen using microcurrent stimulation",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F07FYD0",
+      "description": "Electrotherapeutic treatment of integumentary system - upper back / upper extremity using microcurrent stimulation",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F07GYD0",
+      "description": "Electrotherapeutic treatment of integumentary system - lower back / lower extremity using microcurrent stimulation",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F07HYD0",
+      "description": "Electrotherapeutic treatment of integumentary system - whole body using microcurrent stimulation",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5AZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using negative pressure therapy",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5BZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using physical agents",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5CZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using mechanical equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5DZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using electrotherapeutic equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5EZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using orthosis",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5FZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using assistive, adaptive, supportive or protective equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5UZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using prosthesis",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5YZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen using other equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08E5ZZ",
+      "description": "Wound management treatment of integumentary system - thorax / abdomen",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5AZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using negative pressure therapy",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5BZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using physical agents",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5CZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using mechanical equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5DZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using electrotherapeutic equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5EZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using orthosis",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5FZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using assistive, adaptive, supportive or protective equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5UZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using prosthesis",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5YZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen using other equipment",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "F08P5ZZ",
+      "description": "Wound management treatment of musculoskeletal system - thorax / abdomen",
+      "cms_table_footnote": "**",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "X2723CB",
+      "description": "Dilation of inferior vena cava and iliocaval confluence with open-structure polymer lattice intraluminal device, percutaneous approach, new technology group 11"
+    },
+    {
+      "pcs": "X2HM3GB",
+      "description": "Insertion of lumenless small-diameter defibrillator lead into ventricular septum, percutaneous approach, new technology group 11"
+    },
+    {
+      "pcs": "X2HV3GB",
+      "description": "Insertion of lumenless small-diameter defibrillator lead into right ventricle, percutaneous approach, new technology group 11"
+    },
+    {
+      "pcs": "X2K00FB",
+      "description": "Bypass inferior vena cava using autologous cell seeded tissue engineered resorbable scaffold to pulmonary artery, open approach, new technology group 11"
+    },
+    {
+      "pcs": "X2KG0FB",
+      "description": "Bypass hepatic vein using autologous cell seeded tissue engineered resorbable scaffold to pulmonary artery, open approach, new technology group 11"
+    },
+    {
+      "pcs": "X9HD01B",
+      "description": "Insertion of temporary infusion device into right inner ear, open approach, new technology group 11"
+    },
+    {
+      "pcs": "X9HE01B",
+      "description": "Insertion of temporary infusion device into left inner ear, open approach, new technology group 11"
+    },
+    {
+      "pcs": "X9HF01B",
+      "description": "Insertion of temporary infusion device into bilateral inner ear, open approach, new technology group 11"
+    },
+    {
+      "pcs": "XU7G71B",
+      "description": "Dilation of vagina with temporary electromechanical intraluminal device, via natural or artificial opening, new technology group 11",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "XW0330B",
+      "description": "Introduction of alpha1-proteinase inhibitor into peripheral vein, percutaneous approach, new technology group 11",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "XW0331B",
+      "description": "Introduction of anitocabtagene autoleucel immunotherapy into peripheral vein, percutaneous approach, new technology group 11",
+      "cms_table_footnote": "**"
+    },
+    {
+      "pcs": "XW0430B",
+      "description": "Introduction of alpha1-proteinase inhibitor into central vein, percutaneous approach, new technology group 11",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "XW0431B",
+      "description": "Introduction of anitocabtagene autoleucel immunotherapy into central vein, percutaneous approach, new technology group 11",
+      "cms_table_footnote": "**"
+    },
+    {
+      "pcs": "XW0534B",
+      "description": "Introduction of somatic stem cells into peripheral artery, percutaneous approach, new technology group 11",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "XW0632B",
+      "description": "Introduction of CPI-601 enzyme replacement therapy into cerebral ventricle, percutaneous approach, new technology group 11",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    },
+    {
+      "pcs": "XW0E33B",
+      "description": "Introduction of DB-OTO via intracochlear infusion into ear(s), percutaneous approach, new technology group 11",
+      "cms_table_footnote": "*",
+      "or_procedure": "N"
+    }
+  ]
+}

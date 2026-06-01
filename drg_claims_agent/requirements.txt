@@ -1,0 +1,21 @@
+# DRG Claims Agent - Requirements
+# Install: pip install -r requirements.txt
+# For reproducible production builds, consider: pip freeze > requirements.lock
+
+# DeepAgents (planning, filesystem, sub-agents, skills)
+deepagents>=0.2.0
+
+# Databricks
+databricks-langchain>=0.1.0
+databricks-sdk>=0.30.0
+
+# LangGraph / LangChain
+langgraph>=0.2.0
+langchain-core>=0.3.0
+langchain>=0.3.0
+
+# UI
+streamlit>=1.28.0
+
+# Configuration
+python-dotenv>=1.0.0

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UHC vs Cigna Drug Testing Policy Gap Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .sources {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+        .sources a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .sources a:hover {
+            text-decoration: underline;
+        }
+        .recommendation {
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .recommendation-header {
+            background: #E85D04;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .recommendation-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            padding: 20px;
+            background: #fff;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-top: 1px solid #e0e0e0;
+        }
+        .policy-column {
+            padding: 20px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .policy-column:last-child {
+            border-right: none;
+        }
+        .policy-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .dot-blue {
+            width: 10px;
+            height: 10px;
+            background: #2196F3;
+            border-radius: 50%;
+        }
+        .dot-green {
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+        .policy-text {
+            font-size: 14px;
+            color: #555;
+            font-style: italic;
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid #ddd;
+        }
+        .policy-column.uhc .policy-text {
+            border-left-color: #2196F3;
+        }
+        .policy-column.cigna .policy-text {
+            border-left-color: #4CAF50;
+        }
+        .policy-source {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+        .evidence {
+            background: #E8F5E9;
+            border-left: 4px solid #4CAF50;
+            padding: 12px 16px;
+            margin: 0 20px 20px 20px;
+            border-radius: 0 4px 4px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .evidence-icon {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .evidence-text {
+            font-size: 14px;
+            color: #2E7D32;
+        }
+        .details-section {
+            padding: 20px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .details-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .details-header::before {
+            content: "📋";
+        }
+        .detail-item {
+            margin-bottom: 15px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .detail-content {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7;
+        }
+        .policy-language {
+            background: #E3F2FD;
+            border: 1px solid #BBDEFB;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px;
+        }
+        .policy-language-header {
+            font-weight: 600;
+            color: #1565C0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .policy-language-header::before {
+            content: "📝";
+        }
+        .policy-language-text {
+            font-size: 14px;
+            color: #333;
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px dashed #90CAF9;
+        }
+        .policy-language-code {
+            display: inline-block;
+            background: #FFF3E0;
+            color: #E65100;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .summary-table th {
+            background: #2D3E50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .policy-rec-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(to right, #E85D04, #4CAF50, #2196F3) 1;
+        }
+        .policy-rec-header h2 {
+            color: #333;
+            font-size: 22px;
+            margin: 0;
+        }
+        .policy-rec-header::before {
+            content: "📊";
+            font-size: 24px;
+        }
+        .summary-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .summary-table tr:hover {
+            background: #f5f5f5;
+        }
+        .code-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        .code-table th {
+            background: #f0f0f0;
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .code-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .status-covered {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+        .status-denied {
+            color: #f44336;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Policy Comparison - Evidence Based Report</h1>
+            <h2 style="font-size: 18px; color: #666;">Drug Testing Policy Gap Analysis</h2>
+        </div>
+
+        <div class="sources">
+            <strong>Sources:</strong><br>
+            <strong>UHC:</strong> <a href="https://www.uhcprovider.com/content/dam/provider/docs/public/policies/comm-reimbursement/COMM-Drug-Testing-Policy.pdf" target="_blank">UHC Drug Testing Policy 2025R6005B</a><br>
+            <strong>Cigna:</strong> <a href="https://static.cigna.com/assets/chcp/secure/pdf/resourceLibrary/clinReimPolsModifiers/R25_Drug_Testing_Billing_Requirements.pdf" target="_blank">Cigna R25 Drug Testing Billing Requirements</a> | 
+            <a href="https://static.cigna.com/assets/chcp/pdf/coveragePolicies/medical/mm_0513_coveragepositioncriteria_drug_test.pdf" target="_blank">Cigna Drug Testing Coverage Policy</a><br>
+            <strong>Generated:</strong> January 23, 2026
+        </div>
+
+        <div class="policy-rec-header">
+            <h2>Policy Recommendations</h2>
+        </div>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Rule/Tactic</th>
+                    <th>UHC</th>
+                    <th>Cigna</th>
+                    <th>Recommendation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Definitive Drug Class Limit</td>
+                    <td>No limit - G0480-G0483 all covered</td>
+                    <td>7-8 drug class max; G0482, G0483 NOT covered</td>
+                    <td>Consider drug class limits</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>G0659 Coverage</td>
+                    <td>Covered as definitive test</td>
+                    <td>Not covered or reimbursable</td>
+                    <td>Evaluate G0659 medical necessity</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Annual Frequency Limits</td>
+                    <td>No annual limit specified</td>
+                    <td>Industry practice: 12 presumptive/year</td>
+                    <td>Consider annual limits</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Presumptive Before Definitive</td>
+                    <td>Not required - either can be billed</td>
+                    <td>Presumptive required before definitive in some cases</td>
+                    <td>Consider step-therapy approach</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Pain Management Frequency</td>
+                    <td>No specific frequency guidance</td>
+                    <td>Random testing encouraged; routine testing flagged</td>
+                    <td>Add frequency guidance</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Recommendation 1 -->
+        <h2 class="recommendation-title">Recommendation 1: Definitive Drug Class Limit</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Maximum Drug Classes Per Date of Service</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        "UnitedHealthcare will only allow one drug test within the presumptive Drug Class and one drug test within the definitive Drug Class per date of service." All definitive codes G0480-G0483 and G0659 are listed as reimbursable with no drug class limitation.
+                    </div>
+                    <table class="code-table">
+                        <tr><th>Code</th><th>Drug Classes</th><th>UHC Status</th></tr>
+                        <tr><td>G0480</td><td>1-7 classes</td><td class="status-covered">Covered</td></tr>
+                        <tr><td>G0481</td><td>8-14 classes</td><td class="status-covered">Covered</td></tr>
+                        <tr><td>G0482</td><td>15-21 classes</td><td class="status-covered">Covered</td></tr>
+                        <tr><td>G0483</td><td>22+ classes</td><td class="status-covered">Covered</td></tr>
+                    </table>
+                    <div class="policy-source">📄 UHC Drug Testing Policy 2025R6005B</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Cigna has a drug testing policy that allows <strong>8 definitive tests per date of service</strong>. Due to this limitation, they have determined that G0482 and G0483 are not medically necessary (because both codes exceed the 8 test maximum)."
+                    </div>
+                    <table class="code-table">
+                        <tr><th>Code</th><th>Drug Classes</th><th>Cigna Status</th></tr>
+                        <tr><td>G0480</td><td>1-7 classes</td><td class="status-covered">Covered</td></tr>
+                        <tr><td>G0481</td><td>8-14 classes</td><td class="status-covered">Limited</td></tr>
+                        <tr><td>G0482</td><td>15-21 classes</td><td class="status-denied">NOT Covered</td></tr>
+                        <tr><td>G0483</td><td>22+ classes</td><td class="status-denied">NOT Covered</td></tr>
+                    </table>
+                    <div class="policy-source">📄 Cigna Coverage Policy mm_0513 | AAPC Forum</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna limits definitive drug testing to 7-8 drug classes per DOS. G0482 (15-21 classes) and G0483 (22+ classes) are denied as exceeding medical necessity threshold. UHC has no such limit.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna limits definitive drug testing to a maximum of 7-8 drug classes per date of service, effectively excluding G0482 and G0483 from coverage. This reflects clinical evidence that comprehensive panels testing 15+ drug classes are rarely medically necessary for routine pain management or substance abuse monitoring.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without drug class limits, providers may routinely bill G0483 (22+ classes, highest reimbursement) when clinical need only warrants G0480 (1-7 classes). This "upcoding" tactic (identified as DT-FT006 in UHC fraud patterns) creates significant overpayment exposure. Testing 22+ drug classes for every patient is rarely clinically justified.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider implementing drug class limits for definitive testing, potentially capping at 8-14 classes (G0481 maximum) for routine testing. G0482 and G0483 could require prior authorization or medical necessity documentation demonstrating clinical need for expanded testing.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Definitive Drug Testing Limits</strong><br><br>
+                    UnitedHealthcare considers definitive drug testing of more than 14 drug classes per date of service (G0482, G0483) to require documentation of medical necessity. Routine pain management and substance abuse monitoring typically require testing of 7-14 drug classes. Claims for G0482 or G0483 may be subject to medical review and may be denied or downcoded if documentation does not support the expanded testing panel.
+                </div>
+                <div class="policy-language-code">Denial Code: DT-CLASS-LIMIT</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 2 -->
+        <h2 class="recommendation-title">Recommendation 2: G0659 Coverage Restriction</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">G0659 - Definitive Drug Identification Methods</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        G0659 is listed in the Definitive Drug Testing Codes table as a covered code: "Drug test(s), definitive, utilizing drug identification methods able to identify individual drugs and distinguish between structural isomers."
+                    </div>
+                    <div class="policy-source">📄 UHC Drug Testing Policy 2025R6005B</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "<strong>G0480 or G0659 is not covered or reimbursable.</strong> Definitive drug testing using HCPCS codes G0481, G0482, and G0483 is not covered or [reimbursable in certain circumstances]."
+                    </div>
+                    <div class="policy-source">📄 Cigna Coverage Policy mm_0513</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna explicitly excludes G0659 from coverage. UHC includes G0659 as a covered definitive testing code without restriction.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna has determined that G0659 (definitive drug identification methods for structural isomers) is not covered or reimbursable under their drug testing policy. This specialized testing may be considered investigational or not medically necessary for routine drug monitoring.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">G0659 may be billed as an additional definitive test alongside G0480-G0483, creating potential for duplicate billing. Without clear medical necessity criteria, this code could be used to increase reimbursement without clinical justification for structural isomer identification.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider evaluating the medical necessity criteria for G0659 and potentially requiring prior authorization or documentation demonstrating specific clinical need for structural isomer identification.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>G0659 Medical Necessity Requirement</strong><br><br>
+                    G0659 (definitive drug testing utilizing drug identification methods able to identify individual drugs and distinguish between structural isomers) requires documentation of medical necessity demonstrating specific clinical need for structural isomer differentiation. Routine drug testing does not typically require this level of specificity.
+                </div>
+                <div class="policy-language-code">Denial Code: DT-G0659-MN</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 3 -->
+        <h2 class="recommendation-title">Recommendation 3: Annual Frequency Limits</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Annual Testing Frequency Limits</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        No annual frequency limits specified in the Drug Testing Policy. Policy addresses daily limits only: "one drug test within the presumptive Drug Class and one drug test within the definitive Drug Class per date of service."
+                    </div>
+                    <div class="policy-source">📄 UHC Drug Testing Policy 2025R6005B</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        Industry practice referenced: "Reasonable and necessary to perform POC testing (Codes 80305 and 80306) <strong>up to 12 times annually</strong>. More than 12 times annually may be denied if not deemed medically necessary. Testing should be performed randomly."
+                    </div>
+                    <div class="policy-source">📄 Industry Guidelines - Workers Comp Reference</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Industry practice suggests 12 presumptive tests annually is reasonable. UHC has no annual limit, allowing unlimited testing frequency.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Multiple payers and workers' compensation programs have established annual limits of approximately 12 presumptive drug tests per year as medically reasonable. Testing beyond this frequency requires documentation of medical necessity.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without annual limits, high-volume pain management clinics may perform drug testing at every visit (potentially 24-52 times annually), far exceeding clinical guidelines. This creates significant overpayment for testing that exceeds medical necessity thresholds.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider implementing annual frequency limits for drug testing, potentially 12-16 presumptive and/or definitive tests per year, with medical necessity review for exceeding limits.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Annual Drug Testing Frequency</strong><br><br>
+                    UnitedHealthcare considers up to 12 presumptive drug tests (80305, 80306, 80307, H0003) and up to 12 definitive drug tests (G0480-G0483) per member per calendar year to be reasonable and medically necessary for routine pain management and substance abuse monitoring. Testing frequency exceeding these limits may be subject to medical review and may require documentation supporting medical necessity for increased monitoring.
+                </div>
+                <div class="policy-language-code">Denial Code: DT-FREQ-LIMIT</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 4 -->
+        <h2 class="recommendation-title">Recommendation 4: Step-Therapy Testing Approach</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Presumptive Before Definitive Requirement</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        "A presumptive drug test is not required to be provided prior to a definitive drug test." Either test type can be billed independently without the other.
+                    </div>
+                    <div class="policy-source">📄 UHC Drug Testing Policy 2025R6005B</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        Industry clinical guidelines suggest definitive testing should typically follow positive or unexpected presumptive results. Routine definitive testing without presumptive screening may be considered not medically necessary for initial testing.
+                    </div>
+                    <div class="policy-source">📄 Clinical Guidelines - ASAM, SAMHSA</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Clinical guidelines recommend step-therapy: presumptive screening first, definitive confirmation only when clinically indicated. UHC allows either test independently.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Clinical guidelines from ASAM and SAMHSA recommend a step-therapy approach: presumptive screening first, followed by definitive testing only when results are unexpected, inconsistent with prescribed medications, or require quantitative confirmation.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">The current policy explicitly allows providers to skip presumptive testing and go directly to expensive definitive testing. This creates the "Reflexive Testing Abuse" pattern (DT-FT008) where providers routinely bill both tests for every patient without clinical justification, or jump directly to definitive testing to maximize reimbursement.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider implementing a soft step-therapy approach where definitive testing without same-day or recent presumptive testing triggers medical necessity review, while still allowing clinical exceptions.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Testing Sequence Guidance</strong><br><br>
+                    While a presumptive drug test is not required prior to definitive testing, UnitedHealthcare considers presumptive screening followed by selective definitive confirmation to be the clinically appropriate approach for most routine drug monitoring. Definitive testing without presumptive screening may be subject to medical necessity review. Documentation should support the clinical rationale when definitive testing is performed without prior presumptive screening.
+                </div>
+                <div class="policy-language-code">Review Flag: DT-STEP-THERAPY</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 5 -->
+        <h2 class="recommendation-title">Recommendation 5: Random vs. Routine Testing Guidance</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Testing Pattern Requirements</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        No guidance on random vs. routine testing patterns. Policy does not address testing frequency patterns or require randomization for pain management monitoring.
+                    </div>
+                    <div class="policy-source">📄 UHC Drug Testing Policy 2025R6005B</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "<strong>Testing should be performed randomly.</strong> Routine testing at each office visit is not considered random and may result in denial." Clinical guidelines recommend random drug testing for chronic opioid therapy monitoring.
+                    </div>
+                    <div class="policy-source">📄 Industry Guidelines - Pain Management</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Clinical guidelines recommend random (not routine/every visit) drug testing for pain management. UHC provides no guidance, allowing testing at every visit.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Payers and clinical guidelines specify that drug testing for chronic opioid therapy should be performed randomly, not at every office visit. Routine testing at each visit is considered clinically inappropriate and may indicate billing abuse rather than clinical need.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without random testing guidance, high-volume pain clinics may perform drug testing at every patient visit as routine practice, billing presumptive and/or definitive tests regardless of clinical indication. This pattern billing can generate significant unnecessary costs.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider adding guidance that drug testing for pain management should be performed randomly rather than routinely at each visit, with provider pattern analysis for facilities showing testing rates significantly above expected random frequency.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Drug Testing Pattern Guidance</strong><br><br>
+                    For chronic pain management and substance abuse monitoring, drug testing should be performed on a random basis rather than routinely at each office visit. Routine testing at every visit is not consistent with clinical guidelines and may be subject to medical necessity review. Providers demonstrating testing patterns significantly exceeding random frequency expectations may be subject to utilization review.
+                </div>
+                <div class="policy-language-code">Review Flag: DT-PATTERN-REVIEW</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <strong>Policy Comparison - Evidence Based Report</strong><br>
+            Sources: UHC Drug Testing Policy (2025R6005B), Cigna R25 Drug Testing, Cigna Coverage Policy mm_0513<br>
+            Generated: January 23, 2026
+        </div>
+    </div>
+</body>
+</html>

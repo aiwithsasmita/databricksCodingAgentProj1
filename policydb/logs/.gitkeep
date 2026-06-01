@@ -1,0 +1,3 @@
+# Log files directory
+# Agent logs are stored here with format: agent{N}_{YYYYMMDD}.log
+# Example: agent1_20260128.log

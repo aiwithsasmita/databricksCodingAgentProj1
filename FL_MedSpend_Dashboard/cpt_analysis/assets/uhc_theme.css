@@ -1,0 +1,141 @@
+/* ══════════════════════════════════════════════════════════════════
+   UnitedHealthcare / Optum Theme
+   Primary: #002677 (UHC Blue)   Accent: #FF612B (Optum Orange)
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --uhc-blue: #002677;
+  --uhc-blue-light: #0065B8;
+  --uhc-blue-pale: #E8F0FE;
+  --optum-orange: #FF612B;
+  --optum-orange-light: #FFF0EB;
+  --gray-50: #F8FAFC;
+  --gray-100: #F1F5F9;
+  --gray-200: #E2E8F0;
+  --gray-600: #475569;
+  --gray-800: #1E293B;
+}
+
+body {
+  background-color: #F4F6F9 !important;
+  color: var(--gray-800) !important;
+  font-family: 'Segoe UI', 'Inter', -apple-system, sans-serif !important;
+}
+
+/* ── Cards ─────────────────────────────────────────────────────── */
+.card {
+  background-color: #FFFFFF !important;
+  border: 1px solid var(--gray-200) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 38, 119, 0.10) !important;
+}
+
+/* ── KPI card entrance animation ──────────────────────────────── */
+@keyframes kpiFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.kpi-animate {
+  animation: kpiFadeUp 0.5s ease-out both;
+}
+.kpi-animate:nth-child(1) { animation-delay: 0.0s; }
+.kpi-animate:nth-child(2) { animation-delay: 0.07s; }
+.kpi-animate:nth-child(3) { animation-delay: 0.14s; }
+.kpi-animate:nth-child(4) { animation-delay: 0.21s; }
+.kpi-animate:nth-child(5) { animation-delay: 0.28s; }
+.kpi-animate:nth-child(6) { animation-delay: 0.35s; }
+.kpi-animate:nth-child(7) { animation-delay: 0.42s; }
+
+/* ── Chart container entrance ─────────────────────────────────── */
+@keyframes chartSlideIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-graph {
+  animation: chartSlideIn 0.6s ease-out both;
+}
+.row > div:nth-child(1) .dash-graph { animation-delay: 0.1s; }
+.row > div:nth-child(2) .dash-graph { animation-delay: 0.25s; }
+
+/* ── Tab content fade-in ──────────────────────────────────────── */
+@keyframes tabFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+#tab-content > div {
+  animation: tabFadeIn 0.4s ease-out;
+}
+
+/* ── Tabs styling ─────────────────────────────────────────────── */
+.tab--selected {
+  border-top: 3px solid var(--uhc-blue) !important;
+  color: var(--uhc-blue) !important;
+  font-weight: 700 !important;
+  background-color: #FFFFFF !important;
+}
+.tab {
+  color: var(--gray-600) !important;
+  background-color: var(--gray-100) !important;
+  border: 1px solid var(--gray-200) !important;
+}
+.tab:hover {
+  background-color: var(--uhc-blue-pale) !important;
+  color: var(--uhc-blue) !important;
+}
+
+/* ── Dropdown styling ─────────────────────────────────────────── */
+.Select-control, .Select-menu-outer {
+  background-color: #FFFFFF !important;
+  border-color: var(--gray-200) !important;
+  color: var(--gray-800) !important;
+}
+.Select-value-label, .Select-input > input {
+  color: var(--gray-800) !important;
+}
+.VirtualizedSelectOption {
+  background-color: #FFFFFF !important;
+  color: var(--gray-800) !important;
+}
+.VirtualizedSelectFocusedOption {
+  background-color: var(--uhc-blue-pale) !important;
+}
+
+/* ── DataTable styling ────────────────────────────────────────── */
+.dash-table-container .dash-spreadsheet-container {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ── Header bar ───────────────────────────────────────────────── */
+.uhc-header {
+  background: linear-gradient(135deg, var(--uhc-blue) 0%, #003DA5 100%);
+  color: #FFFFFF;
+  border-radius: 0 0 12px 12px;
+  padding: 16px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 38, 119, 0.20);
+}
+
+/* ── Filter bar ───────────────────────────────────────────────── */
+.filter-bar {
+  background-color: #FFFFFF !important;
+  border: 1px solid var(--gray-200);
+  border-left: 4px solid var(--uhc-blue);
+}
+
+/* ── Alert row pulse ──────────────────────────────────────────── */
+@keyframes alertPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.risk-high {
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--uhc-blue); border-radius: 3px; }

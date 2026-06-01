@@ -1,0 +1,736 @@
+ICD-10 MS-DRGs Version 43.1 Effective April 01, 2026
+The Centers for Medicare & Medicaid Services (CMS) is implementing 80 new procedure codes
+into the International Classification of Diseases, Tenth Revision, Procedure Coding System (ICD10-PCS), effective April 01, 2026.
+The ICD-10 MS-DRG Grouper assigns each case into an MS-DRG based on the reported
+diagnosis and procedure codes and demographic information (age, sex, and discharge status).
+The ICD-10 Medicare Code Editor (MCE) Version 43.1 software uses edits to detect and report
+errors in the claims data for the ICD-10 codes reported to validate correct coding on claims for
+discharges on or after April 01, 2026.
+The ICD-10 MS-DRG Grouper software package to accommodate these 80 new codes, Version
+43.1, is effective for discharges on or after April 01, 2026.
+Assignment of the 80 new ICD-10-PCS procedure codes is as follows:
+Procedure
+Code
+Description O.R. MDC MS-DRG
+02HM3JZ** Insertion of pacemaker lead into ventricular septum,
+percutaneous approach
+N 01
+05
+21
+24
+040-042
+260-262
+907-909
+957-959
+02HM3KZ Insertion of defibrillator lead into ventricular septum,
+percutaneous approach
+Y 05
+14
+17
+18
+19
+23
+25
+265
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+02HM3MZ** Insertion of cardiac lead into ventricular septum,
+percutaneous approach
+N 05 260-262
+02HM3NZ Insertion of intracardiac pacemaker into ventricular
+septum, percutaneous approach
+Y 05
+14
+17
+18
+19
+23
+25
+228-229
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+02HM3YZ Insertion of other device into ventricular septum,
+percutaneous approach
+Y 05
+14
+17
+18
+19
+23
+25
+260-262
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+0DDU0ZZ Extraction of omentum, open approach Y 06
+07
+10
+13
+14
+17
+18
+18
+19
+23
+356-358
+423-425
+628-630
+749-750
+768-769
+817-819
+820-822
+826-828
+853-855
+856-858
+876
+939-941
+0DDU4ZZ Extraction of omentum, percutaneous endoscopic
+approach
+Y 06
+07
+10
+13
+14
+17
+18
+18
+19
+23
+356-358
+423-425
+628-630
+749-750
+768-769
+817-819
+820-822
+826-828
+853-855
+856-858
+876
+939-941
+0DDV0ZZ Extraction of mesentery, open approach Y 06
+07
+10
+13
+14
+17
+18
+18
+19
+23
+356-358
+423-425
+628-630
+749-750
+768-769
+817-819
+820-822
+826-828
+853-855
+856-858
+876
+939-941
+0DDV4ZZ Extraction of mesentery, percutaneous endoscopic
+approach
+Y 06
+07
+10
+13
+14
+17
+18
+18
+19
+23
+356-358
+423-425
+628-630
+749-750
+768-769
+817-819
+820-822
+826-828
+853-855
+856-858
+876
+939-941
+0F9480D* Drainage of gallbladder with drainage device, via natural
+or artificial opening endoscopic, transmural
+N
+0F9480E* Drainage of gallbladder with drainage device, via natural
+or artificial opening endoscopic, transpapillary
+N
+0F9580D* Drainage of right hepatic duct with drainage device, via
+natural or artificial opening endoscopic, transmural
+N
+0F9580E* Drainage of right hepatic duct with drainage device, via
+natural or artificial opening endoscopic, transpapillary
+N
+0F9680D* Drainage of left hepatic duct with drainage device, via
+natural or artificial opening endoscopic, transmural
+N
+0F9680E* Drainage of left hepatic duct with drainage device, via
+natural or artificial opening endoscopic, transpapillary
+N
+0F9780D* Drainage of common hepatic duct with drainage device,
+via natural or artificial opening endoscopic, transmural
+N
+0F9780E* Drainage of common hepatic duct with drainage device, via
+natural or artificial opening endoscopic, transpapillary
+N
+0F9880D* Drainage of cystic duct with drainage device, via natural
+or artificial opening endoscopic, transmural
+N
+0F9880E* Drainage of cystic duct with drainage device, via natural
+or artificial opening endoscopic, transpapillary
+N
+0F9980D* Drainage of common bile duct with drainage device, via
+natural or artificial opening endoscopic, transmural
+N
+0F9980E* Drainage of common bile duct with drainage device, via
+natural or artificial opening endoscopic, transpapillary
+N
+0F9C80D* Drainage of ampulla of vater with drainage device, via
+natural or artificial opening endoscopic, transmural
+N
+0F9C80E* Drainage of ampulla of vater with drainage device, via
+natural or artificial opening endoscopic, transpapillary
+N
+0F9D80D* Drainage of pancreatic duct with drainage device, via
+natural or artificial opening endoscopic, transmural
+N
+0F9D80E* Drainage of pancreatic duct with drainage device, via
+natural or artificial opening endoscopic, transpapillary
+N
+0F9F80D* Drainage of accessory pancreatic duct with drainage
+device, via natural or artificial opening endoscopic,
+transmural
+N
+0F9F80E* Drainage of accessory pancreatic duct with drainage
+device, via natural or artificial opening endoscopic,
+transpapillary
+N
+0F9G80D* Drainage of pancreas with drainage device, via natural or
+artificial opening endoscopic, transmural
+N
+0F9G80E* Drainage of pancreas with drainage device, via natural or
+artificial opening endoscopic, transpapillary
+N
+0TXB0Z6 Transfer bladder to right ureter, open approach Y 11
+14
+17
+18
+19
+21
+23
+24
+25
+656-658
+659-661
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+907-909
+939-941
+957-959
+969-970
+0TXB0Z7 Transfer bladder to left ureter, open approach Y 11
+14
+17
+18
+19
+21
+23
+24
+25
+656-658
+659-661
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+907-909
+939-941
+957-959
+969-970
+0TXB4Z6 Transfer bladder to right ureter, percutaneous
+endoscopic approach
+Y 11
+14
+17
+18
+19
+21
+23
+656-658
+659-661
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+907-909
+939-941
+24
+25
+957-959
+969-970
+0TXB4Z7 Transfer bladder to left ureter, percutaneous endoscopic
+approach
+Y 11
+14
+17
+18
+19
+21
+23
+24
+25
+656-658
+659-661
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+907-909
+939-941
+957-959
+969-970
+0VT00ZE Resection of prostate, open approach, capsule intact Y 11
+12
+17
+18
+19
+23
+25
+665-667
+707-708
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+0VT04ZE Resection of prostate, percutaneous endoscopic
+approach, capsule intact
+Y 11
+12
+17
+18
+19
+23
+665-667
+707-708
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+0VT07ZE Resection of prostate, via natural or artificial opening,
+capsule intact
+Y 11
+12
+17
+18
+19
+23
+665-667
+713-714
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+0VT08ZE Resection of prostate, via natural or artificial opening
+endoscopic, capsule intact
+Y 11
+12
+17
+665-667
+713-714
+823-825
+18
+19
+23
+829-830
+850
+853-855
+856-858
+876
+939-941
+3E033AZ* Introduction of embryonic stem cells into peripheral vein,
+percutaneous approach
+N
+3E043AZ* Introduction of embryonic stem cells into central vein,
+percutaneous approach
+N
+4A0FXEJ* Measurement of musculoskeletal body composition
+using air displacement plethysmography, external
+approach
+N
+5A0221E Assistance with cardiac output using blood flow
+modulator, continuous
+Y 05
+14
+17
+18
+19
+23
+25
+270-272
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+F07DYD0** Electrotherapeutic treatment of integumentary system -
+head and neck using microcurrent stimulation
+N 23 945-946
+F07EYD0** Electrotherapeutic treatment of integumentary system -
+thorax / abdomen using microcurrent stimulation
+N 23 945-946
+F07FYD0** Electrotherapeutic treatment of integumentary system -
+upper back / upper extremity using microcurrent
+stimulation
+N 23 945-946
+F07GYD0** Electrotherapeutic treatment of integumentary system -
+lower back / lower extremity using microcurrent
+stimulation
+N 23 945-946
+F07HYD0** Electrotherapeutic treatment of integumentary system -
+whole body using microcurrent stimulation
+N 23 945-946
+F08E5AZ** Wound management treatment of integumentary system
+- thorax / abdomen using negative pressure therapy
+N 23 945-946
+F08E5BZ** Wound management treatment of integumentary system
+- thorax / abdomen using physical agents
+N 23 945-946
+F08E5CZ** Wound management treatment of integumentary system
+- thorax / abdomen using mechanical equipment
+N 23 945-946
+F08E5DZ** Wound management treatment of integumentary system
+- thorax / abdomen using electrotherapeutic equipment
+N 23 945-946
+F08E5EZ** Wound management treatment of integumentary system
+- thorax / abdomen using orthosis
+N 23 945-946
+F08E5FZ** Wound management treatment of integumentary system
+- thorax / abdomen using assistive, adaptive, supportive
+or protective equipment
+N 23 945-946
+F08E5UZ** Wound management treatment of integumentary system
+- thorax / abdomen using prosthesis
+N 23 945-946
+F08E5YZ** Wound management treatment of integumentary system
+- thorax / abdomen using other equipment
+N 23 945-946
+F08E5ZZ** Wound management treatment of integumentary system
+- thorax / abdomen
+N 23 945-946
+F08P5AZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using negative pressure
+therapy
+N 23 945-946
+F08P5BZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using physical agents
+N 23 945-946
+F08P5CZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using mechanical equipment
+N 23 945-946
+F08P5DZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using electrotherapeutic
+equipment
+N 23 945-946
+F08P5EZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using orthosis
+N 23 945-946
+F08P5FZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using assistive, adaptive,
+supportive or protective equipment
+N 23 945-946
+F08P5UZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using prosthesis
+N 23 945-946
+F08P5YZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen using other equipment
+N 23 945-946
+F08P5ZZ** Wound management treatment of musculoskeletal
+system - thorax / abdomen
+N 23 945-946
+X2723CB Dilation of inferior vena cava and iliocaval confluence
+with open-structure polymer lattice intraluminal device,
+percutaneous approach, new technology group 11
+Y 01
+04
+05
+06
+07
+08
+09
+10
+11
+14
+17
+18
+19
+037-039
+166-168
+252-254
+356-358
+423-425
+515-517
+579-581
+628-630
+673-675
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+21
+23
+24
+25
+907-909
+939-941
+957-959
+969-970
+X2HM3GB Insertion of lumenless small-diameter defibrillator lead
+into ventricular septum, percutaneous approach, new
+technology group 11
+Y 05
+14
+17
+18
+19
+23
+25
+265
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+X2HV3GB Insertion of lumenless small-diameter defibrillator lead
+into right ventricle, percutaneous approach, new
+technology group 11
+Y 05
+14
+17
+18
+19
+23
+25
+265
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+X2K00FB Bypass inferior vena cava using autologous cell seeded
+tissue engineered resorbable scaffold to pulmonary
+artery, open approach, new technology group 11
+Y 05
+14
+17
+18
+19
+23
+25
+228-229
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+X2KG0FB Bypass hepatic vein using autologous cell seeded tissue
+engineered resorbable scaffold to pulmonary artery,
+open approach, new technology group 11
+Y 05
+14
+17
+18
+19
+23
+25
+228-229
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+X9HD01B Insertion of temporary infusion device into right inner
+ear, open approach, new technology group 11
+Y 03
+14
+17
+18
+19
+23
+25
+143-145
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+X9HE01B Insertion of temporary infusion device into left inner ear,
+open approach, new technology group 11
+Y 03
+14
+17
+18
+19
+23
+25
+143-145
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+X9HF01B Insertion of temporary infusion device into bilateral inner
+ear, open approach, new technology group 11
+Y 03
+14
+17
+18
+19
+23
+25
+143-145
+768-769
+817-819
+823-825
+829-830
+850
+853-855
+856-858
+876
+939-941
+969-970
+XU7G71B* Dilation of vagina with temporary electromechanical
+intraluminal device, via natural or artificial opening, new
+technology group 11
+N
+XW0330B* Introduction of alpha1-proteinase inhibitor into
+peripheral vein, percutaneous approach, new technology
+group 11
+N
+XW0331B** Introduction of anitocabtagene autoleucel
+immunotherapy into peripheral vein, percutaneous
+approach, new technology group 11
+N PreMDC
+018
+XW0430B* Introduction of alpha1-proteinase inhibitor into central
+vein, percutaneous approach, new technology group 11
+N
+XW0431B** Introduction of anitocabtagene autoleucel
+immunotherapy into central vein, percutaneous
+approach, new technology group 11
+N PreMDC
+018
+XW0534B* Introduction of somatic stem cells into peripheral artery,
+percutaneous approach, new technology group 11
+N
+XW0632B* Introduction of CPI-601 enzyme replacement therapy
+into cerebral ventricle, percutaneous approach, new
+technology group 11
+N
+XW0E33B* Introduction of DB-OTO via intracochlear infusion into
+ear(s), percutaneous approach, new technology group 11
+N
+*As the procedure codes are designated as non-O.R. procedures, there is no assigned MDC or MS-DRG. The ICD-10 MS-DRG
+assignment is dependent on the reported principal diagnosis, any secondary diagnoses defined as a complication or
+comorbidity (CC) or major complication or comorbidity (MCC), procedures or services performed, age, sex, and discharge
+status.
+**Non-O.R. procedure affecting the MS-DRG assignment.
+The ICD-10 MS-DRG V43.1 Grouper Software, Definitions Manual Table of Contents and the
+Definitions of Medicare Code Edits V43.1 manual will be available at
+https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/AcuteInpatientPPS/MSDRG-Classifications-and-Software.html
+The Code Tables, Index and related Addenda files for the 80 new procedure codes will be
+available at: https://www.cms.gov/medicare/coding-billing/icd-10-codes

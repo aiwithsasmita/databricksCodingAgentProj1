@@ -1,0 +1,42 @@
+# SAMPLE POLICY FILE - DELETE THIS AND ADD YOUR REAL POLICIES
+
+# Expected Format:
+# ================
+# Place your healthcare policy documents here as .txt files
+# 
+# Example filename: UHC_Ambulance_Policy_Raw.txt
+#
+# The policy text should include:
+# - Policy ID (e.g., 2026R0123A)
+# - Policy title
+# - Coverage guidelines
+# - Coding requirements (CPT, HCPCS, modifiers)
+# - Denial conditions
+# - Q&A sections (if available)
+#
+# Example content structure:
+# --------------------------
+
+POLICY NUMBER: 2026R0001A
+TITLE: Sample Healthcare Policy
+
+COVERAGE GUIDELINES
+-------------------
+This policy covers...
+
+CODING REQUIREMENTS
+-------------------
+The following CPT codes apply: 99213, 99214, 99215
+Modifier 25 is required when...
+
+DENIAL CONDITIONS
+-----------------
+Claims will be denied when:
+1. Modifier 25 is missing on E/M services billed same day as procedure
+2. Units exceed maximum allowed per day
+3. ...
+
+Q&A SECTION
+-----------
+Q1: When is modifier 25 required?
+A1: Modifier 25 is required when...

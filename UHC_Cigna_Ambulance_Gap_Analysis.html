@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UHC vs Cigna Ambulance Policy Gap Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .sources {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+        .sources a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .sources a:hover {
+            text-decoration: underline;
+        }
+        .recommendation {
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .recommendation-header {
+            background: #E85D04;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .recommendation-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            padding: 20px;
+            background: #fff;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border-top: 1px solid #e0e0e0;
+        }
+        .policy-column {
+            padding: 20px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .policy-column:last-child {
+            border-right: none;
+        }
+        .policy-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .dot-blue {
+            width: 10px;
+            height: 10px;
+            background: #2196F3;
+            border-radius: 50%;
+        }
+        .dot-green {
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+        .policy-text {
+            font-size: 14px;
+            color: #555;
+            font-style: italic;
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid #ddd;
+        }
+        .policy-column.uhc .policy-text {
+            border-left-color: #2196F3;
+        }
+        .policy-column.cigna .policy-text {
+            border-left-color: #4CAF50;
+        }
+        .policy-source {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+        .evidence {
+            background: #E8F5E9;
+            border-left: 4px solid #4CAF50;
+            padding: 12px 16px;
+            margin: 0 20px 20px 20px;
+            border-radius: 0 4px 4px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .evidence-icon {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .evidence-text {
+            font-size: 14px;
+            color: #2E7D32;
+        }
+        .details-section {
+            padding: 20px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+        }
+        .details-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .details-header::before {
+            content: "📋";
+        }
+        .detail-item {
+            margin-bottom: 15px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .detail-content {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.7;
+        }
+        .policy-language {
+            background: #E3F2FD;
+            border: 1px solid #BBDEFB;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px;
+        }
+        .policy-language-header {
+            font-weight: 600;
+            color: #1565C0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .policy-language-header::before {
+            content: "📝";
+        }
+        .policy-language-text {
+            font-size: 14px;
+            color: #333;
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px dashed #90CAF9;
+        }
+        .policy-language-code {
+            display: inline-block;
+            background: #FFF3E0;
+            color: #E65100;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .summary-table th {
+            background: #2D3E50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .policy-rec-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(to right, #E85D04, #4CAF50, #2196F3) 1;
+        }
+        .policy-rec-header h2 {
+            color: #333;
+            font-size: 22px;
+            margin: 0;
+        }
+        .policy-rec-header::before {
+            content: "📊";
+            font-size: 24px;
+        }
+        .summary-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .summary-table tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Policy Comparison - Evidence Based Report</h1>
+        </div>
+
+        <div class="sources">
+            <strong>Sources:</strong><br>
+            <strong>UHC:</strong> <a href="https://www.uhcprovider.com/content/dam/provider/docs/public/policies/comm-reimbursement/COMM-Ambulance-Policy.pdf" target="_blank">UHC Ambulance Policy 2026R0123A</a><br>
+            <strong>Cigna:</strong> <a href="https://static.cigna.com/assets/chcp/secure/pdf/resourceLibrary/clinReimPolsModifiers/R18_Ambulance_Services.pdf" target="_blank">Cigna R18 Ambulance Services (08/29/2025)</a><br>
+            <strong>Generated:</strong> January 23, 2026
+        </div>
+
+        <div class="policy-rec-header">
+            <h2>Policy Recommendations</h2>
+        </div>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Rule/Tactic</th>
+                    <th>UHC</th>
+                    <th>Cigna</th>
+                    <th>Recommendation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Non-Emergency H Modifier</td>
+                    <td>Any valid O/D modifier</td>
+                    <td>Requires "H" in origin OR destination</td>
+                    <td>Adopt H-modifier restriction</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>T-Code Exclusion</td>
+                    <td>Not explicitly addressed</td>
+                    <td>T2001-T2007 explicitly non-reimbursable</td>
+                    <td>Add explicit T-code denial</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Waiting Time Charges</td>
+                    <td>A0420 in transport code list</td>
+                    <td>Waiting time explicitly non-reimbursable</td>
+                    <td>Consider removing A0420</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Unloaded Miles</td>
+                    <td>Not explicitly addressed</td>
+                    <td>Explicitly non-reimbursable</td>
+                    <td>Add explicit denial</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Non-Licensed Transport</td>
+                    <td>General statement only</td>
+                    <td>Explicit exclusion list</td>
+                    <td>Add explicit exclusion list</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Deceased Transport</td>
+                    <td>Not explicitly addressed</td>
+                    <td>Explicitly non-reimbursable</td>
+                    <td>Add explicit denial</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Ancillary Fees</td>
+                    <td>Not explicitly addressed</td>
+                    <td>Parking, tolls, meals denied</td>
+                    <td>Add explicit exclusion</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Bundled Codes List</td>
+                    <td>External attachment reference</td>
+                    <td>100+ codes listed inline</td>
+                    <td>Embed list in policy</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Recommendation 1 -->
+        <h2 class="recommendation-title">Recommendation 1: Non-Emergency H Modifier Requirement</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Non-Emergency Hospital Destination Requirement</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        "UnitedHealthcare will reimburse a code on the Ambulance Transportation Codes list only when reported with a two-digit ambulance modifier on the Ambulance Modifiers list."
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Non-emergent licensed ground ambulance services are reimbursable IF either the origin or destination of the non-emergency ambulance transport was to/from a hospital (identified by the ambulance modifier H). Any non-emergent licensed ambulance transport that does not identify either the origin or destination of the transport with an H modifier is <strong>not reimbursable</strong>."
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna restricts non-emergency ambulance (A0426, A0428) to hospital-involved transports only. UHC allows any valid O/D modifier combination for non-emergency codes.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna denies non-emergency transports (A0426, A0428) without hospital involvement (H modifier). This means transports like R→N, N→P, E→J are not reimbursable under Cigna's policy.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Under current UHC policy, providers may bill non-emergency ambulance codes for transports that do not involve hospital-level care (routine dialysis, physician visits, inter-facility transfers). These services may not require ambulance-level transport and could be serviced by lower-cost alternatives.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider implementing an "H-modifier requirement" edit for non-emergency ground ambulance codes (A0426, A0428). This would automatically deny non-emergency transports that do not involve a hospital origin or destination, aligning with peer payer practices.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Non-Emergency Ambulance Transport Limitation</strong><br><br>
+                    For non-emergency ground ambulance services (A0426, A0428), UnitedHealthcare requires that either the origin or destination of the transport be a hospital, identified by the "H" modifier. Non-emergency ambulance transports without "H" in the modifier combination will be denied.
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-NONEMERG-H</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 2 -->
+        <h2 class="recommendation-title">Recommendation 2: T-Code Exclusion</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Non-Emergency Transport T-Codes</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        Not explicitly addressed in policy. T-codes (T2001-T2007) are not mentioned in the Ambulance Policy reimbursement guidelines.
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Cigna does not provide separate reimbursement for the following HCPCS T status codes: <strong>T2001, T2002, T2003, T2004, T2005 and T2007</strong> with or without the use of the origin/destination modifiers."
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna explicitly excludes T-codes from reimbursement. UHC policy does not address these codes, creating potential gap.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna explicitly denies T-codes (T2001-T2007) for non-emergency transport services. These codes represent transport services like patient attendant/escort, per diem transport, stretcher van, and waiting time that are not covered under ambulance benefits.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without explicit denial language, T-codes may be submitted for reimbursement for non-covered transport services. These codes could bypass ambulance edits as they are not in the standard A0xxx ambulance code range.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider adding explicit language excluding T-codes (T2001, T2002, T2003, T2004, T2005, T2007) from reimbursement to align with peer practices and close this potential gap.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Non-Reimbursable Transport T-Codes</strong><br><br>
+                    UnitedHealthcare does not provide separate reimbursement for HCPCS T status codes T2001, T2002, T2003, T2004, T2005, and T2007 with or without origin/destination modifiers. These codes represent non-emergency transportation services not covered under ambulance benefits.
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-TCODE</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 3 -->
+        <h2 class="recommendation-title">Recommendation 3: Waiting Time Charges</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Ambulance Waiting Time (A0420)</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        A0420 is listed in the Ambulance Transportation Codes table as: "Ambulance waiting time (ALS/BLS) per half hour" - implying it may be reimbursable.
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Cigna does not provide reimbursement for: <strong>Waiting time charges</strong> (i.e., time spent waiting for the individual)"
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna explicitly excludes waiting time from reimbursement. UHC lists A0420 as a potentially reimbursable transport code.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna explicitly excludes ambulance waiting time charges from reimbursement, treating time spent waiting for the patient as part of the base ambulance service.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Providers may bill excessive waiting time units (A0420) for routine delays. Without explicit limits or exclusion, waiting time charges could significantly increase ambulance transport costs beyond medical necessity.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider adding waiting time exclusion or implementing unit limits for A0420 to align with peer practices and prevent abuse.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Ambulance Waiting Time</strong><br><br>
+                    UnitedHealthcare does not provide separate reimbursement for ambulance waiting time (A0420). Time spent waiting for the patient is considered part of the ambulance service and is not separately billable.
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-WAIT</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 4 -->
+        <h2 class="recommendation-title">Recommendation 4: Unloaded Miles</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Unloaded Mileage Charges</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        Not explicitly addressed in policy. Mileage codes (A0380, A0390, A0425) are listed without specification on loaded vs unloaded miles.
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Cigna does not provide reimbursement for: <strong>Charges for unloaded miles</strong> (i.e., miles traveled without the individual on board)"
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna explicitly denies mileage without patient on board. UHC does not specify loaded vs unloaded mile restrictions.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna explicitly denies reimbursement for miles traveled without the patient on board (unloaded miles), limiting payment to actual transport distance only.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without explicit restriction, providers may bill mileage for return trips, pre-pickup travel from base station, or other non-transport miles. This can significantly inflate mileage charges beyond actual patient transport distance.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider adding explicit language restricting mileage reimbursement to loaded miles only (point of pickup to destination with patient on board).</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Unloaded Mileage</strong><br><br>
+                    UnitedHealthcare does not provide reimbursement for unloaded miles (miles traveled without the patient on board). Only loaded mileage from point of pickup to destination is reimbursable.
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-UNLOAD</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 5 -->
+        <h2 class="recommendation-title">Recommendation 5: Non-Licensed Transport Exclusion</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Non-Licensed Transport Services</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        "UnitedHealthcare considers only an Ambulance Supplier as eligible for reimbursement of ambulance services." (General statement without explicit exclusion list)
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Cigna does not provide reimbursement for: Transportation from a non-licensed ambulance which include but are not limited to <strong>wheelchair van, chair car, taxi, automobile, private or commercial air travel, bus and mini-bus service</strong>"
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna provides explicit list of excluded non-ambulance transport types. UHC has only general statement about Ambulance Supplier requirement.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna explicitly lists non-covered transport types including wheelchair van, chair car, taxi, automobile, private vehicle, commercial air travel, bus, and mini-bus services.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without explicit exclusion list, non-ambulance transport services could potentially be billed under ambulance codes. Clear enumeration provides stronger basis for denial and reduces ambiguity.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider adding explicit list of excluded non-licensed transport types to strengthen policy clarity and enforcement.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Non-Licensed Transport Exclusion</strong><br><br>
+                    UnitedHealthcare does not provide reimbursement for transportation services from non-licensed ambulance providers, including but not limited to: wheelchair van, chair car, taxi, automobile, private vehicle, commercial air travel, bus, and mini-bus services. These services are not eligible under ambulance benefits regardless of codes billed.
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-NONLIC</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 6 -->
+        <h2 class="recommendation-title">Recommendation 6: Deceased Transport</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Deceased Patient Transport</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        Not explicitly addressed in policy. No specific guidance on transport of deceased patients.
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Cigna does not provide reimbursement for: Services for <strong>transfer of a deceased member</strong> to a funeral home, morgue or hospital when the individual was pronounced dead at the scene"
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna explicitly denies transport of deceased patients. UHC policy does not address this scenario.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna explicitly excludes reimbursement for transport of deceased members to funeral homes, morgues, or hospitals when the individual was pronounced dead at the scene.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without explicit denial language, ambulance services could be billed for body transport after death at scene. These services do not constitute medical transport and should not be covered under ambulance benefits.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider adding explicit language excluding deceased patient transport from ambulance reimbursement.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Deceased Patient Transport</strong><br><br>
+                    UnitedHealthcare does not provide reimbursement for ambulance services involving transport of a deceased member to a funeral home, morgue, or hospital when the individual was pronounced dead at the scene. Ambulance services are for transport of living patients requiring medical care.
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-DECEASED</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 7 -->
+        <h2 class="recommendation-title">Recommendation 7: Ancillary Fees</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Ancillary Transportation Fees</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        Not explicitly addressed in policy. No specific guidance on ancillary fees such as parking, tolls, meals, or lodging.
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        "Cigna does not provide reimbursement for: <strong>Ancillary transportation fees</strong> (e.g., parking fees, tolls, meals and lodging)"
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna explicitly excludes ancillary fees. UHC policy does not address these charges.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna explicitly denies reimbursement for ancillary transportation fees including parking fees, tolls, meals, and lodging expenses.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">Without explicit exclusion, providers may bill additional fees beyond the transport service itself. While likely not common, explicit language provides clear basis for denial.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider adding explicit language excluding ancillary transportation fees from ambulance reimbursement.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Ancillary Transportation Fees</strong><br><br>
+                    UnitedHealthcare does not provide separate reimbursement for ancillary transportation fees including but not limited to: parking fees, tolls, meals, lodging, and other incidental expenses. These are not covered under ambulance benefits.
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-ANCIL</div>
+            </div>
+        </div>
+
+        <!-- Recommendation 8 -->
+        <h2 class="recommendation-title">Recommendation 8: Bundled Codes List</h2>
+        <div class="recommendation">
+            <div class="recommendation-header">Bundled Services Code List</div>
+            
+            <div class="comparison-grid">
+                <div class="policy-column uhc">
+                    <div class="policy-label">
+                        <span class="dot-blue"></span>
+                        UHC CURRENT
+                    </div>
+                    <div class="policy-text">
+                        "Refer to Attachments section: Ambulance Bundle Codes" - External reference to attachment rather than inline list.
+                    </div>
+                    <div class="policy-source">📄 UHC Ambulance Policy 2026R0123A</div>
+                </div>
+                <div class="policy-column cigna">
+                    <div class="policy-label">
+                        <span class="dot-green"></span>
+                        CIGNA
+                    </div>
+                    <div class="policy-text">
+                        Policy contains <strong>100+ specific bundled codes inline</strong> including: J0131, J0171, J0282, J0461, J1170, J1200, J1610, J1885, J2001, J2060, J2250, J2270, J2300, J2310, J2405, J2550, J2930, J3010, J3475, J7030, J7040, J7120, E0443, E0444, E0445, 93000-93010, and many more.
+                    </div>
+                    <div class="policy-source">📄 Cigna R18 - Reimbursement Policy</div>
+                </div>
+            </div>
+
+            <div class="evidence">
+                <span class="evidence-icon">✓</span>
+                <span class="evidence-text"><strong>EVIDENCE:</strong> Cigna embeds complete bundled code list directly in policy body. UHC references external attachment.</span>
+            </div>
+
+            <div class="details-section">
+                <div class="details-header">Recommendation Details</div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">What peers are doing:</div>
+                    <div class="detail-content">Cigna includes comprehensive list of 100+ bundled codes directly within the policy document, covering drugs (J-codes), supplies (A-codes), equipment (E-codes), and services (CPT codes) that are included in ambulance base rate.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Potential for exploitation:</div>
+                    <div class="detail-content">External attachment references may not be consistently applied across claims systems. Inline code lists provide clearer reference for both providers and claim adjudicators, reducing disputes and improving edit consistency.</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Suggested action:</div>
+                    <div class="detail-content">UHC may wish to consider embedding the full bundled code list directly in the policy body rather than referencing an external attachment, improving transparency and enforcement consistency.</div>
+                </div>
+            </div>
+
+            <div class="policy-language">
+                <div class="policy-language-header">Suggested Policy Language</div>
+                <div class="policy-language-text">
+                    <strong>Services Bundled in Ambulance Transport</strong><br><br>
+                    The following codes are included in ambulance base rate and are not separately reimbursable when billed with ambulance transport codes:<br><br>
+                    <strong>Drug Codes:</strong> J0131, J0171, J0282, J0461, J1170, J1200, J1610, J1885, J2001, J2060, J2270, J2310, J2405, J3010, J7030, J7040, J7120<br><br>
+                    <strong>Supply/Equipment:</strong> A4611-A4627, A6000-A6550, A7000-A7527, E0424-E0480, E0445<br><br>
+                    <strong>Services:</strong> 93000-93010 (EKG)
+                </div>
+                <div class="policy-language-code">Denial Code: AMB-BUND</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <strong>Policy Comparison - Evidence Based Report</strong><br>
+            Sources: UHC Ambulance Policy (2026R0123A), Cigna R18 (08/29/2025)<br>
+            Generated: January 23, 2026
+        </div>
+    </div>
+</body>
+</html>
