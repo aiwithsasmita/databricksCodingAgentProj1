@@ -1,283 +1,357 @@
-# NextGen Agentic Intelligence
+# Agentic Fraud Detection Framework
 
-> UnitedHealthcare · powered by Optum
+An agentic AI framework using LangGraph for healthcare fraud detection with human-in-the-loop approval.
 
-A UnitedHealthcare / Optum healthcare-analytics platform built on LangChain
-**`deepagents`**. A **supervisor deep agent** (GPT‑5.5) routes questions to
-specialized subagents, served to a **Next.js** chat UI with **voice input**, a
-**human-in-the-loop SQL** approval flow, and a **"Show flow"** execution diagram.
+## Overview
 
-> The header recreates the UnitedHealthcare nested-U mark as a clean SVG
-> (`frontend/public/uhc-mark.svg`) — swap in the official vector at that path when
-> you have it.
+This framework uses a **parent agent** that orchestrates fraud pattern detection by:
 
-> **Stage 1** delivers the working architecture end-to-end with the four
-> subagents **stubbed** (correct routing, illustrative mock data). Later stages
-> swap the stubs for live **Databricks Genie** tools, the real clinical-evidence
-> skill, and an Excel-backed CMS context agent.
+1. **Breaking patterns into steps** - Converts complex fraud patterns into manageable SQL generation tasks
+2. **Using Genie as a tool** - Leverages Databricks Genie for NLP-to-SQL conversion
+3. **Human-in-the-loop** - Asks for approval/edit at each step
+4. **Executing and validating** - Runs SQL and validates results
+5. **Combining into functions** - Creates reusable SQL functions
+6. **Storing as tools** - Inserts final functions into Databricks tools table
 
 ## Architecture
 
 ```
-                       ┌─────────────────────────────┐
-   user (text/voice) → │  Next.js chat UI (frontend)  │
-                       └──────────────┬──────────────┘
-                                      │ SSE  /api/chat
-                       ┌──────────────▼──────────────┐
-                       │  FastAPI (backend)          │
-                       │  Supervisor DEEP AGENT       │  ← GPT-5.5
-                       │  (deepagents + LangGraph)    │
-                       │  plans · files · `task` tool │
-                       └───┬────────┬────────┬────────┘
-            task delegates │        │        │        │
-                ┌──────────▼─┐ ┌────▼─────┐ ┌▼────────┐ ┌▼──────────┐
-                │ drg-agent  │ │ appeals  │ │callcenter│ │ context   │
-                │ +skill+3   │ │  -agent  │ │  -agent  │ │  -agent   │
-                │ mock tools │ │          │ │          │ │ (CMS ref) │
-                └────────────┘ └──────────┘ └──────────┘ └───────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    Parent Agent (LangGraph)                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐     ┌──────────────┐     ┌──────────────┐    │
+│  │ Parse Pattern │────▶│ Generate SQL │────▶│ Await        │    │
+│  │              │     │ (Genie Tool) │     │ Approval     │    │
+│  └──────────────┘     └──────────────┘     └──────┬───────┘    │
+│                                                    │            │
+│                          ┌────────────────────────┼────────┐   │
+│                          │                        │        │   │
+│                          ▼                        ▼        ▼   │
+│                    ┌──────────┐           ┌──────────┐ ┌──────┐│
+│                    │ Execute  │           │ Regenerate│ │ Edit ││
+│                    │ SQL      │           │ SQL       │ │ SQL  ││
+│                    └────┬─────┘           └──────────┘ └──────┘│
+│                         │                                       │
+│                         ▼                                       │
+│                    ┌──────────────┐                             │
+│                    │ Await        │                             │
+│                    │ Feedback     │                             │
+│                    └──────┬───────┘                             │
+│                           │                                      │
+│              ┌────────────┴────────────┐                        │
+│              │                         │                        │
+│              ▼                         ▼                        │
+│        ┌──────────┐              ┌──────────┐                   │
+│        │ Store SQL│              │ Regenerate│                  │
+│        │ (sqlcode)│              │           │                  │
+│        └────┬─────┘              └──────────┘                   │
+│             │                                                    │
+│             ▼                                                    │
+│        ┌──────────┐     ┌──────────────┐     ┌──────────────┐   │
+│        │ Next Step│────▶│ Combine to   │────▶│ Execute      │   │
+│        │          │     │ Function     │     │ Final        │   │
+│        └──────────┘     └──────────────┘     └──────┬───────┘   │
+│                                                      │           │
+│                                                      ▼           │
+│        ┌──────────┐     ┌──────────────┐     ┌──────────────┐   │
+│        │ Complete │◀────│ Insert Tool  │◀────│ Await Final  │   │
+│        │          │     │              │     │ Approval     │   │
+│        └──────────┘     └──────────────┘     └──────────────┘   │
+│                                                      │           │
+│                                               ┌──────┴───────┐   │
+│                                               │   Rethink    │   │
+│                                               └──────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-- **Supervisor**: built with `create_deep_agent(model, system_prompt, subagents=[…])`.
-  Gets planning (`write_todos`), a virtual filesystem, and the `task` tool that
-  spawns subagents in isolated context — all from `deepagents`. A `MemorySaver`
-  checkpointer gives per-`thread_id` conversation memory.
-- **drg-agent**: shift analysis (no CC/MCC → CC → MCC, national + statewise),
-  ICD drivers, **clinical-evidence skill** (`backend/skills/drg_clinical_evidence/SKILL.md`),
-  and provider/TIN super-outlier detection. Uses live **Databricks Genie** tools
-  when configured (Stage 2), else 3 mock tools.
-- **appeals-agent / callcenter-agent / context-agent**: stubbed specialists.
-- **data-agent**: general Databricks **Genie** Q&A — appears when any `agent:"data"`
-  space is configured (Stage 2). Routes ad-hoc data questions to live SQL.
-- **search-agent**: free **DuckDuckGo** web search (no API key) for current
-  events / external facts — `backend/app/tools/search_tools.py`.
-- **Voice**: browser Web Speech API (no extra model) → GPT‑5.5 stays the only LLM.
+## Workflow Steps
 
-## Repository layout
+### Step 1: Parse Pattern
+- Loads pattern from `patterns.json`
+- Breaks down `detection_logic` into individual steps
+- Displays pattern information to user
+
+### Step 2: Generate SQL (for each step)
+- Sends step description to Databricks Genie
+- Genie converts natural language to SQL
+- Falls back to LLM if Genie fails
+
+### Step 3: Human Approval
+- Displays generated SQL
+- Options:
+  - **[yes]** - Approve and execute
+  - **[no]** - Reject and regenerate
+  - **[edit]** - Edit SQL manually
+
+### Step 4: Execute SQL
+- Runs approved SQL against claims table
+- Shows results preview
+
+### Step 5: Execution Feedback
+- Asks if results look correct
+- Options:
+  - **[yes]** - Continue to next step
+  - **[no]** - Regenerate SQL
+
+### Step 6: Store SQL
+- Saves approved SQL to `sqlcode.md`
+- Stores in memory for later combination
+
+### Step 7: Combine to Function
+- Uses LLM to combine all step SQLs
+- Creates optimized final query with CTEs
+
+### Step 8: Final Execution
+- Executes combined function
+- Shows total fraudulent claims detected
+
+### Step 9: Final Approval
+- Asks if final results are correct
+- Options:
+  - **[yes]** - Save as tool
+  - **[no]** - Rethink and adjust
+
+### Step 10: Insert Tool
+- Inserts function into `fraud_detection.policies.sql_tools`
+- Updates pattern with tool reference
+- Marks as complete
+
+## Files
 
 ```
-backend/    FastAPI + deepagents supervisor agent (Python)
-frontend/   Next.js 14 chat UI (TypeScript, Tailwind)
+agentic_fraud_detection/
+├── main.py              # Main entry point
+├── workflow.py          # LangGraph workflow definition
+├── state.py             # State management for LangGraph
+├── genie_tool.py        # Databricks Genie wrapper
+├── sql_executor.py      # SQL execution against Databricks
+├── sql_storage.py       # SQL code storage to markdown
+├── config.py            # Configuration management
+├── patterns.json        # Fraud pattern definition
+├── requirements.txt     # Python dependencies
+├── env.template         # Environment variables template
+└── README.md            # This file
 ```
 
-See [the plan](#) and inline `# STAGE-1 MOCK` markers for what becomes real later.
+## Setup
 
-## Prerequisites
+### 1. Install Dependencies
 
-- Python 3.11+ (tested on 3.14)
-- Node.js 18+
-- An OpenAI API key with access to the configured `MODEL` (default `gpt-5.5`)
-
-## Run the backend
-
-```powershell
-cd backend
-# One-shot: creates venv, installs deps, copies .env, starts the API
-./run.ps1
-```
-
-Or manually:
-
-```powershell
-cd backend
-python -m venv .venv
-./.venv/Scripts/Activate.ps1
+```bash
 pip install -r requirements.txt
-Copy-Item .env.example .env   # then set a real OPENAI_API_KEY
-uvicorn app.main:app --reload --port 8000
 ```
 
-Health check: <http://localhost:8000/api/health> → `{"status":"ok","model":"gpt-5.5"}`
+### 2. Configure Environment
 
-Smoke test (no API calls — verifies wiring):
+```bash
+# Copy template
+cp env.template .env
 
-```powershell
-cd backend
-./.venv/Scripts/python.exe tests/test_smoke.py
+# Edit .env with your credentials
 ```
 
-## Run the frontend
+Required environment variables:
+- `DATABRICKS_HOST` - Databricks workspace URL
+- `DATABRICKS_TOKEN` - Databricks access token
+- `GENIE_SPACE_ID` - Genie Space ID for SQL generation
+- `DBSQL_SERVER_HOSTNAME` - SQL Warehouse hostname
+- `DBSQL_HTTP_PATH` - SQL Warehouse HTTP path
+- `OPENAI_API_KEY` - OpenAI API key for LLM orchestration
 
-```powershell
-cd frontend
-npm install
-Copy-Item .env.local.example .env.local   # NEXT_PUBLIC_API_URL=http://localhost:8000
-npm run dev
+### 3. Ensure Databricks Tables Exist
+
+Run the quick start from `demo/uhc_global_days_poc/QUICK_START_DATABRICKS.md` first to create:
+- `fraud_detection.test_data.claims` - Claims table
+- `fraud_detection.policies.patterns` - Patterns table
+- `fraud_detection.policies.sql_tools` - SQL tools table
+
+## Usage
+
+### Run the Framework
+
+```bash
+cd demo/agentic_fraud_detection
+python main.py
 ```
 
-Open <http://localhost:3000>.
+### Interactive Workflow
 
-## Configuration
+1. **Pattern Display**: Shows the pattern to be processed
+2. **Confirmation**: Asks if you want to proceed
+3. **Step Processing**: For each step:
+   - Generates SQL
+   - Waits for your approval
+   - Executes and shows results
+   - Waits for your feedback
+4. **Function Creation**: Combines all steps
+5. **Final Approval**: Asks for final confirmation
+6. **Tool Insertion**: Saves to database
 
-| Where | Var | Purpose |
-| ----- | --- | ------- |
-| `backend/.env` | `OPENAI_API_KEY` | OpenAI key (**fake placeholder by default**) |
-| `backend/.env` | `MODEL` | LLM id, default `gpt-5.5` (change if your account differs) |
-| `backend/.env` | `FRONTEND_ORIGIN` | CORS origin for the UI |
-| `frontend/.env.local` | `NEXT_PUBLIC_API_URL` | Backend base URL |
-
-> **`gpt-5.5`**: if you get `model_not_found`, set `MODEL` to a model your key can
-> access. Sampling params are left default to avoid GPT‑5-family 400s.
-
-## Try it
-
-- *"Is DRG 871 (Septicemia) shifting toward MCC since 2023?"* → **drg-agent**
-- *"Which MS-DRGs did CMS add in 2026?"* → **context-agent**
-- *"What's our appeals overturn rate this year?"* → **appeals-agent**
-- *"Top call-center reasons in the last 30 days?"* → **callcenter-agent**
-- Tap the mic (Chrome/Edge) and speak any of the above.
-
-## Security note
-
-`backend/.env` holds secrets and is **git-ignored**. If you pasted a key in
-plaintext anywhere, rotate it.
-
-## Stage 2 — Databricks Genie (live data)
-
-The DRG agent can query real data through the **Databricks Genie Conversation
-API**. Each configured Genie space becomes its own tool (`genie_<name>`) that the
-agent calls with a natural-language question; it returns the **generated SQL plus
-result rows** as JSON. With no credentials configured, the DRG agent automatically
-falls back to the Stage-1 mock tools, so the app always runs.
-
-**Code:** [app/genie/client.py](backend/app/genie/client.py) (API wrapper),
-[registry.py](backend/app/genie/registry.py) (space registry),
-[tools.py](backend/app/genie/tools.py) (per-space tool factory), wired in
-[subagents/drg_agent.py](backend/app/subagents/drg_agent.py).
-
-**Configure (Azure, PAT auth)** in `backend/.env`:
+### Example Session
 
 ```
-DATABRICKS_HOST=https://adb-XXXXXXXXXXXX.azuredatabricks.net
-DATABRICKS_TOKEN=dapiXXXXXXXX
-# One entry per Genie space (single-line JSON). name -> tool genie_<name>.
-GENIE_SPACES=[{"name":"drg_shift","space_id":"01ef...","agent":"drg","description":"DRG severity tier mix and coding shift by fiscal year, US and statewise."},{"name":"drg_providers","space_id":"01ef...","agent":"drg","description":"Provider/TIN-level utilization of DRG severity codes with state and national benchmarks."}]
+============================================================
+Processing Pattern: E/M Services During Global Period Without Modifier 24
+============================================================
+
+Pattern ID: FP-GD-001
+Description: Detect E/M services...
+
+Detection Steps: 6
+  Step 1: Identify all surgical procedures with global days values...
+  Step 2: Calculate the global period end date...
+  ...
+
+============================================================
+STEP 1/6: Generating SQL
+============================================================
+
+Sending to Genie...
+
+Generated SQL:
+```sql
+SELECT claim_id, patient_id, provider_npi, service_date
+FROM fraud_detection.test_data.claims
+WHERE global_days_value IN ('010', '090')
+LIMIT 50
 ```
 
-**Verify the live connection** (run on a machine with network access to the
-workspace — VPN/PrivateLink as needed):
+============================================================
+AWAITING SQL APPROVAL
+============================================================
 
-```powershell
-cd backend
-./.venv/Scripts/python.exe scripts/genie_smoke.py <SPACE_ID> "How many DRG 871 cases by fiscal year?"
+Options:
+  [yes/y] - Approve and execute
+  [no/n]  - Reject and regenerate
+  [edit]  - Edit the SQL manually
+
+Your choice: yes
+
+============================================================
+EXECUTING SQL
+============================================================
+
+[OK] Query executed successfully
+Returned 5 rows
+
+Sample Results:
+  Row 1: {'claim_id': 'CLM002', ...}
+  ...
+
+============================================================
+AWAITING EXECUTION FEEDBACK
+============================================================
+
+Results look correct? (5 rows)
+  [yes/y] - Results are correct, continue
+  [no/n]  - Results are wrong, regenerate SQL
+
+Your choice: yes
+
+[OK] Storing SQL for Step 1
+[OK] Moving to Step 2/6
+
+... (continues for all steps) ...
+
+============================================================
+WORKFLOW COMPLETE!
+============================================================
+
+Pattern: E/M Services During Global Period Without Modifier 24
+Tool ID: tool_fp_gd_001
+Tool Inserted: True
+Fraudulent Claims Found: 3
+
+SQL Code saved to: ./output/sqlcode.md
 ```
 
-It prints the status, generated SQL, columns, and rows — confirming auth + space
-ID + extraction before you wire it into the agent.
+## Output Files
 
-**Notes**
-- Auth is PAT (`DATABRICKS_HOST`/`DATABRICKS_TOKEN`); the SDK also accepts CLI
-  profiles / OAuth if you leave these blank.
-- Results return inline (`data_array`) for normal sizes; very large results use
-  presigned `EXTERNAL_LINKS` — the client flags this and asks you to aggregate.
-- Genie free-tier throughput is ~5 questions/min/workspace; each tool call starts
-  a fresh conversation (recommended for accuracy).
+### sqlcode.md
 
-## Stage 3 — Human-in-the-loop SQL (data-agent)
+Contains all generated SQL code:
 
-The generic **data-agent** (backed by the NYC-taxi Genie space) generates SQL,
-then **pauses for human approval** before running it — using deepagents'
-`interrupt_on` middleware. The chat shows an **editable SQL card**: Approve & Run,
-Run Edited, or Reject. Approved/edited queries are **saved** so the same question
-later runs instantly with **no approval**.
+```markdown
+# SQL Code Storage
 
-Flow ([backend/app/genie/hitl_tools.py](backend/app/genie/hitl_tools.py),
-[data_agent.py](backend/app/subagents/data_agent.py)):
+Generated at: 2026-01-04T11:30:00
 
-```
-ad-hoc data Q → run_saved_sql(q)   → cached approved SQL? run directly (no HITL)
-              → genie_generate_sql(q) → Genie proposes SQL
-              → execute_sql(sql, q)   → INTERRUPT: approve / edit / reject
-                                        approve → run proposed · edit → run yours · reject → skip
-              → on success → save {q → SQL}  ⇒ next time no HITL
+## Step Queries
+
+### Step 1: step_1 
+**Description:** Identify all surgical procedures...
+**Status:** ✅ Approved
+```sql
+SELECT ...
 ```
 
-**Protocol:** `/api/chat` streams tokens and, if the run pauses, ends with an
-`interrupt` SSE event carrying the SQL. The UI shows
-[SqlApprovalCard](frontend/components/SqlApprovalCard.tsx); the decision is sent
-to **`/api/resume`** which resumes the graph with
-`Command(resume={"decisions":[…]})` ([main.py](backend/app/main.py)). Approved SQL
-runs via the Databricks SQL Statement Execution API on the space's warehouse
-(auto-resolved, or set `GENIE_WAREHOUSE_ID`).
+### Step 2: step_2
+...
 
-**Validate it** (live, no UI):
+## Final Combined Function
 
-```powershell
-cd backend
-./.venv/Scripts/python.exe scripts/hitl_smoke.py approve
-./.venv/Scripts/python.exe scripts/hitl_smoke.py edit "SELECT ROUND(SUM(fare_amount),2) AS total FROM samples.nyctaxi.trips"
-./.venv/Scripts/python.exe scripts/hitl_smoke.py reject
-./.venv/Scripts/python.exe scripts/hitl_smoke.py repeat   # saved query → no approval
+**Function Name:** detect_fp_gd_001
+```sql
+WITH surgical_procedures AS (
+    ...
+)
+SELECT ...
+```
 ```
 
-Approved queries persist in `backend/data/saved_queries.json` (git-ignored).
-Delete it to reset the "saved tools".
+## Customization
 
-## Flow visualization ("Show flow")
+### Adding New Patterns
 
-Every answer carries a **Mermaid flow diagram** of how it was produced — which
-specialist it routed to, the tools it called, the generated SQL, the human
-approve/edit/reject decision, and the result. Each assistant message has a
-**"Show flow"** button that renders it.
+Edit `patterns.json` to add new patterns:
 
-How it's captured ([backend/app/trace.py](backend/app/trace.py)): a LangChain
-callback handler (`TraceCollector`) records each tool/agent step as the graph
-runs (callbacks propagate into subagents, so inner steps are captured too).
-Built-in housekeeping tools (`ls`, `write_todos`, …) are filtered out. The steps
-are turned into a Mermaid `flowchart` and sent as a final **`trace`** SSE event;
-[FlowDiagram.tsx](frontend/components/FlowDiagram.tsx) renders it with mermaid.js
-(themed to the UHC/Optum palette, with a raw-code fallback).
-
-## CMS Context Agent (real CMS data, FY2023–FY2026)
-
-The **context‑agent** answers CMS/MS‑DRG reference questions from the **official
-CMS IPPS Final Rule files** (public‑domain U.S. government data), ingested for
-**FY2023–FY2026** (MS‑DRG v40–v43):
-
-- **Full MS‑DRG catalog** (~770 DRGs/year) — code, title, MDC, MED/SURG, severity
-  tier, relative weight, mean LOS (from **Table 5**).
-- **Change log** — DRGs added / deleted / retitled each year (auto‑derived by
-  diffing consecutive years).
-- **IPPS rule highlights + provider payment factors** — CMS rule id, payment
-  update %, effective date, wage index, DSH/uncompensated care, NTAP, quality
-  programs (verified per‑year).
-- **ICD‑10 update counts for all four years** (new/invalid diagnosis & procedure
-  codes, revised titles, MCC/CC list sizes + additions/deletions — from **Tables
-  6**), plus **per‑year MCC/CC change lists** and the complete current (FY2026)
-  MCC (3,354) and CC (15,078) lists for the status lookup.
-
-**Code:** ingestion `backend/scripts/ingest_cms.py`; loader
-[app/cms_store.py](backend/app/cms_store.py); 8 tools in
-[app/tools/cms_tools.py](backend/app/tools/cms_tools.py) (`cms_drg_lookup`,
-`cms_drg_changes`, `cms_ipps_rule`, `cms_search_drgs`, `cms_compare_drg`,
-`cms_cc_mcc`, `cms_icd10_updates`, `cms_cc_mcc_changes`); wired in
-[subagents/context_agent.py](backend/app/subagents/context_agent.py).
-
-**Rebuild the datasets** (downloads the official CMS Table 5 + Tables 6 ZIPs and
-parses them into `backend/data/cms/*.json`):
-
-```powershell
-cd backend
-./.venv/Scripts/python.exe scripts/ingest_cms.py
+```json
+{
+  "patterns": [
+    {
+      "pattern_id": "FP-GD-002",
+      "pattern_name": "New Pattern Name",
+      "description": "...",
+      "severity": "HIGH",
+      "detection_logic": {
+        "step1": "First step description",
+        "step2": "Second step description",
+        ...
+      }
+    }
+  ]
+}
 ```
 
-**Ask it:** *"Which MS‑DRGs did CMS add/delete in FY2026?"*, *"What is DRG 209?"*,
-*"What's the FY2026 payment update and provider payment changes?"*, *"What changed
-for DRG 871 since 2023?"*, *"Is ICD‑10 R65.20 a CC or MCC?"*, *"How many new ICD‑10
-codes in FY2026?"* — answers cite the CMS rule id and effective date.
+### Modifying Workflow
 
-> Data files under `backend/data/cms/` are git‑ignored (regenerate with the
-> ingestion script). All sourced from public‑domain CMS publications.
+Edit `workflow.py` to customize:
+- Node functions
+- Routing logic
+- Prompts for Genie/LLM
+- Human interaction points
 
-## Roadmap (next stages)
+## Troubleshooting
 
-1. ~~**DRG agent → Databricks Genie**~~ ✅ Stage 2 (this) — multiple Genie spaces as
-   tools, with mock fallback. Next: implement the full shift / ICD-driver / outlier
-   *analytics* on top of the live data, and add more spaces.
-2. **Clinical-evidence skill**: fill `SKILL.md` with validated criteria + data tools.
-3. **Context agent**: back `cms_context_lookup` with the local CMS Excel
-   (`pandas`/`openpyxl`).
-4. **Appeals / Call-center**: add their Genie spaces to `GENIE_SPACES` with
-   `"agent":"appeals"` / `"agent":"callcenter"` and wire `genie_tools_for(...)`
-   into those subagents (same pattern as the DRG agent).
-5. **HITL**: add `interrupt_on` for expensive queries (approve before running).
-```
+### Genie Connection Issues
+- Verify `GENIE_SPACE_ID` is correct
+- Check Databricks token permissions
+- Ensure Genie Space has access to tables
+
+### SQL Execution Errors
+- Verify table names match
+- Check SQL syntax
+- Use edit option to fix SQL
+
+### LLM Errors
+- Verify OpenAI API key
+- Check model availability
+- Review prompts in workflow.py
+
+## License
+
+Internal use only.
+
+
