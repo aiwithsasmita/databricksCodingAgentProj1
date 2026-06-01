@@ -1,0 +1,112 @@
+{
+  "2023": {
+    "fy": "2023",
+    "cms_id": "CMS-1771-F",
+    "rule_title": "FY2023 IPPS/LTCH PPS Final Rule",
+    "ms_drg_version": "v40",
+    "publication_date": "2022-08-01",
+    "effective_date": "2022-10-01",
+    "operating_update_pct": 4.3,
+    "market_basket_pct": 4.1,
+    "productivity_adjustment_pct": -0.3,
+    "other_statutory_adjustment_pct": 0.5,
+    "total_payment_impact": "+$1.4 billion vs FY2022 (largest increase in 25 years)",
+    "provider_payment_factors": {
+      "wage_index": "Made permanent a 5% cap on any single-year decrease in a hospital's wage index; continued low-wage-index hospital policy; included urban-to-rural reclassified hospital wage data in the rural floor.",
+      "dsh_uncompensated_care": "Continued Medicare DSH and uncompensated care payment methodology; supplemental payment for Indian Health Service / Tribal and Puerto Rico hospitals.",
+      "ntap": "Continued/updated New Technology Add-on Payments for qualifying technologies.",
+      "quality_programs": "Established the 'Birthing-Friendly' hospital designation; advanced health-equity measures (RFI and new measures in Hospital IQR/VBP)."
+    },
+    "key_changes": [
+      "+4.3% operating payment update for IQR + meaningful-EHR hospitals.",
+      "Permanent 5% cap on year-over-year wage index decreases.",
+      "New 'Birthing-Friendly' hospital designation.",
+      "Health-equity focused quality measures and reporting."
+    ],
+    "sources": [
+      "https://www.cms.gov/newsroom/fact-sheets/fy-2023-hospital-inpatient-prospective-payment-system-ipps-and-long-term-care-hospital-prospective"
+    ]
+  },
+  "2024": {
+    "fy": "2024",
+    "cms_id": "CMS-1785-F",
+    "rule_title": "FY2024 IPPS/LTCH PPS Final Rule",
+    "ms_drg_version": "v41",
+    "publication_date": "2023-08-01",
+    "effective_date": "2023-10-01",
+    "operating_update_pct": 3.1,
+    "market_basket_pct": 3.3,
+    "productivity_adjustment_pct": -0.2,
+    "standardized_amount": "$6,497.77 (IQR + meaningful-EHR hospitals)",
+    "total_payment_impact": "approximately +$2.2 billion vs FY2023",
+    "provider_payment_factors": {
+      "wage_index": "Continued the low-wage-index hospital policy and the 5% cap on wage index decreases.",
+      "dsh_uncompensated_care": "Updated Medicare DSH / uncompensated care payments.",
+      "ntap": "Continued NTAP for 11 technologies still considered new; discontinued 15 no longer new; net NTAP decrease of about $460 million.",
+      "quality_programs": "Finalized a health-equity adjustment to hospitals' Total Performance Score in the Hospital VBP Program (rewarding care for dual-eligible patients)."
+    },
+    "key_changes": [
+      "+3.1% operating payment update; standardized amount $6,497.77.",
+      "Severity of the three homelessness ICD-10-CM codes (Z59.0-) changed from NonCC to CC.",
+      "Health-equity adjustment added to the Hospital VBP Total Performance Score.",
+      "15 new MS-DRGs created and 16 deleted (net 766 MS-DRGs)."
+    ],
+    "sources": [
+      "https://www.cms.gov/newsroom/fact-sheets/fy-2024-hospital-inpatient-prospective-payment-system-ipps-and-long-term-care-hospital-prospective-0"
+    ]
+  },
+  "2025": {
+    "fy": "2025",
+    "cms_id": "CMS-1808-F",
+    "rule_title": "FY2025 IPPS/LTCH PPS Final Rule",
+    "ms_drg_version": "v42",
+    "publication_date": "2024-08-01",
+    "effective_date": "2024-10-01",
+    "operating_update_pct": 2.9,
+    "total_payment_impact": "approximately +$3.2 billion vs FY2024 (DSH uncompensated care about -$0.2 billion)",
+    "provider_payment_factors": {
+      "wage_index": "Adopted the revised OMB Core-Based Statistical Area (CBSA) delineations (2023) for the wage index.",
+      "dsh_uncompensated_care": "Projected Medicare DSH uncompensated care payments to decrease by about $0.2 billion; MDH and low-volume hospital provisions set to expire Dec 31, 2024 (about -$0.4 billion if they expire).",
+      "ntap": "Increased the NTAP percentage from 65% to 75% for certain gene therapies used to treat sickle cell disease.",
+      "quality_programs": "Adopted new measures across IQR/VBP/HAC/Readmissions; finalized the Transforming Episode Accountability Model (TEAM) - a mandatory bundled-payment model beginning Jan 1, 2026."
+    },
+    "key_changes": [
+      "+2.9% net operating payment update.",
+      "NTAP raised to 75% for qualifying sickle-cell-disease gene therapies.",
+      "Adopted 2023 CBSA delineations for the wage index.",
+      "Finalized the mandatory Transforming Episode Accountability Model (TEAM), effective Jan 1, 2026."
+    ],
+    "sources": [
+      "https://www.cms.gov/newsroom/fact-sheets/fy-2025-hospital-inpatient-prospective-payment-system-ipps-and-long-term-care-hospital-prospective-0"
+    ]
+  },
+  "2026": {
+    "fy": "2026",
+    "cms_id": "CMS-1833-F",
+    "rule_title": "FY2026 IPPS/LTCH PPS Final Rule",
+    "ms_drg_version": "v43",
+    "publication_date": "2025-07-31",
+    "effective_date": "2025-10-01",
+    "operating_update_pct": 2.6,
+    "market_basket_pct": 3.3,
+    "productivity_adjustment_pct": -0.7,
+    "total_payment_impact": "approximately +$5.0 billion vs FY2025, including about +$2.0 billion in Medicare DSH uncompensated care payments",
+    "provider_payment_factors": {
+      "wage_index": "Discontinued the low-wage-index hospital policy (begun in FY2020); applied a transitional/budget-neutral adjustment for affected hospitals.",
+      "dsh_uncompensated_care": "Projected increase in Medicare DSH uncompensated care payments of about $2.0 billion.",
+      "ntap": "Updated New Technology Add-on Payments for qualifying technologies for FY2026.",
+      "quality_programs": "Advanced electronic clinical quality measures (eCQMs) and digital quality measurement; updates across IQR/VBP/HAC/Readmissions; continued TEAM model implementation."
+    },
+    "key_changes": [
+      "+2.6% operating payment update for IQR + meaningful-EHR hospitals.",
+      "Ended the low-wage-index hospital payment policy.",
+      "New MS-DRGs 209 (complex aortic arch), 213 (endovascular abdominal aorta w/ iliac branch), 318/359/360 (percutaneous coronary atherectomy).",
+      "Deleted hypertensive-encephalopathy MS-DRGs 077, 078, 079 (and others).",
+      "Adopted MS-DRG v43 (772 MS-DRGs)."
+    ],
+    "sources": [
+      "https://www.cms.gov/newsroom/fact-sheets/fy-2026-hospital-inpatient-prospective-payment-system-ipps-and-long-term-care-hospital-prospective-0",
+      "https://www.federalregister.gov/documents/2025/08/04/2025-14681/medicare-program-hospital-inpatient-prospective-payment-systems-for-acute-care-hospitals-ipps-and"
+    ]
+  }
+}

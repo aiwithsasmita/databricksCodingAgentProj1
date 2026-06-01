@@ -1,0 +1,14 @@
+# Secrets / local env (NEVER commit)
+.env
+.env.local
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# CMS data: keep parsed JSON (data/cms/*.json, public-domain); exclude raw + runtime
+data/cms/raw/
+data/saved_queries.json

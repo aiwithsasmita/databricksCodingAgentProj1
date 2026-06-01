@@ -1,0 +1,22 @@
+# Core agent framework
+deepagents>=0.2.0
+langchain>=0.3.0
+langchain-openai>=0.2.0
+langchain-community>=0.3.0
+langgraph>=0.2.0
+
+# Free web search (no API key)
+ddgs>=6.0.0
+
+# API server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+sse-starlette>=2.1.0
+pydantic>=2.7.0
+pydantic-settings>=2.3.0
+python-dotenv>=1.0.0
+
+# Stage 2 data access — Databricks Genie + CMS Excel
+databricks-sdk>=0.40.0
+pandas>=2.2.0
+openpyxl>=3.1.0

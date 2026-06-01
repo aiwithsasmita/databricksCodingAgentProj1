@@ -1,0 +1,475 @@
+[
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "173",
+  "title": "ULTRASOUND ACCELERATED AND OTHER THROMBOLYSIS WITH PRINCIPAL DIAGNOSIS PULMONARY EMBOLISM"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "212",
+  "title": "CONCOMITANT AORTIC AND MITRAL VALVE PROCEDURES"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "275",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITH CARDIAC CATHETERIZATION AND MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "276",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "277",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "278",
+  "title": "ULTRASOUND ACCELERATED AND OTHER THROMBOLYSIS OF PERIPHERAL VASCULAR STRUCTURES WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "279",
+  "title": "ULTRASOUND ACCELERATED AND OTHER THROMBOLYSIS OF PERIPHERAL VASCULAR STRUCTURES WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "321",
+  "title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITH INTRALUMINAL DEVICE WITH MCC OR 4+ ARTERIES/INTRALUMINAL DEVICES"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "322",
+  "title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITH INTRALUMINAL DEVICE WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "323",
+  "title": "CORONARY INTRAVASCULAR LITHOTRIPSY WITH INTRALUMINAL DEVICE WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "324",
+  "title": "CORONARY INTRAVASCULAR LITHOTRIPSY WITH INTRALUMINAL DEVICE WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "325",
+  "title": "CORONARY INTRAVASCULAR LITHOTRIPSY WITHOUT INTRALUMINAL DEVICE"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "397",
+  "title": "APPENDIX PROCEDURES WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "398",
+  "title": "APPENDIX PROCEDURES WITH CC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "added",
+  "drg": "399",
+  "title": "APPENDIX PROCEDURES WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "222",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITH CARDIAC CATHETERIZATION WITH AMI, HF OR SHOCK WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "223",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITH CARDIAC CATHETERIZATION WITH AMI, HF OR SHOCK WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "224",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITH CARDIAC CATHETERIZATION WITHOUT AMI, HF OR SHOCK WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "225",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITH CARDIAC CATHETERIZATION WITHOUT AMI, HF OR SHOCK WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "226",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITHOUT CARDIAC CATHETERIZATION WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "227",
+  "title": "CARDIAC DEFIBRILLATOR IMPLANT WITHOUT CARDIAC CATHETERIZATION WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "246",
+  "title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITH DRUG-ELUTING STENT WITH MCC OR 4+ ARTERIES OR STENTS"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "247",
+  "title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITH DRUG-ELUTING STENT WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "248",
+  "title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITH NON-DRUG-ELUTING STENT WITH MCC OR 4+ ARTERIES OR STENTS"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "249",
+  "title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITH NON-DRUG-ELUTING STENT WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "338",
+  "title": "APPENDECTOMY WITH COMPLICATED PRINCIPAL DIAGNOSIS WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "339",
+  "title": "APPENDECTOMY WITH COMPLICATED PRINCIPAL DIAGNOSIS WITH CC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "340",
+  "title": "APPENDECTOMY WITH COMPLICATED PRINCIPAL DIAGNOSIS WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "341",
+  "title": "APPENDECTOMY WITHOUT COMPLICATED PRINCIPAL DIAGNOSIS WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "342",
+  "title": "APPENDECTOMY WITHOUT COMPLICATED PRINCIPAL DIAGNOSIS WITH CC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "deleted",
+  "drg": "343",
+  "title": "APPENDECTOMY WITHOUT COMPLICATED PRINCIPAL DIAGNOSIS WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "retitled",
+  "drg": "124",
+  "old_title": "OTHER DISORDERS OF THE EYE WITH MCC",
+  "new_title": "OTHER DISORDERS OF THE EYE WITH MCC OR THROMBOLYTIC AGENT"
+ },
+ {
+  "fy": "2024",
+  "change_type": "retitled",
+  "drg": "250",
+  "old_title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITHOUT CORONARY ARTERY STENT WITH MCC",
+  "new_title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITHOUT INTRALUMINAL DEVICE WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "retitled",
+  "drg": "251",
+  "old_title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITHOUT CORONARY ARTERY STENT WITHOUT MCC",
+  "new_title": "PERCUTANEOUS CARDIOVASCULAR PROCEDURES WITHOUT INTRALUMINAL DEVICE WITHOUT MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "retitled",
+  "drg": "799",
+  "old_title": "SPLENECTOMY WITH MCC",
+  "new_title": "SPLENIC PROCEDURES WITH MCC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "retitled",
+  "drg": "800",
+  "old_title": "SPLENECTOMY WITH CC",
+  "new_title": "SPLENIC PROCEDURES WITH CC"
+ },
+ {
+  "fy": "2024",
+  "change_type": "retitled",
+  "drg": "801",
+  "old_title": "SPLENECTOMY WITHOUT CC/MCC",
+  "new_title": "SPLENIC PROCEDURES WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "317",
+  "title": "CONCOMITANT LEFT ATRIAL APPENDAGE CLOSURE AND CARDIAC ABLATION"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "402",
+  "title": "SINGLE LEVEL COMBINED ANTERIOR AND POSTERIOR SPINAL FUSION EXCEPT CERVICAL"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "426",
+  "title": "MULTIPLE LEVEL COMBINED ANTERIOR AND POSTERIOR SPINAL FUSION EXCEPT CERVICAL WITH MCC OR CUSTOM-MADE ANATOMICALLY DESIGNED INTERBODY FUSION DEVICE"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "427",
+  "title": "MULTIPLE LEVEL COMBINED ANTERIOR AND POSTERIOR SPINAL FUSION EXCEPT CERVICAL WITH CC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "428",
+  "title": "MULTIPLE LEVEL COMBINED ANTERIOR AND POSTERIOR SPINAL FUSION EXCEPT CERVICAL WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "429",
+  "title": "COMBINED ANTERIOR AND POSTERIOR CERVICAL SPINAL FUSION WITH MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "430",
+  "title": "COMBINED ANTERIOR AND POSTERIOR CERVICAL SPINAL FUSION WITHOUT MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "447",
+  "title": "MULTIPLE LEVEL SPINAL FUSION EXCEPT CERVICAL WITH MCC OR CUSTOM-MADE ANATOMICALLY DESIGNED INTERBODY FUSION DEVICE"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "448",
+  "title": "MULTIPLE LEVEL SPINAL FUSION EXCEPT CERVICAL WITHOUT MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "450",
+  "title": "SINGLE LEVEL SPINAL FUSION EXCEPT CERVICAL WITH MCC OR CUSTOM-MADE ANATOMICALLY DESIGNED INTERBODY FUSION DEVICE"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "451",
+  "title": "SINGLE LEVEL SPINAL FUSION EXCEPT CERVICAL WITHOUT MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "added",
+  "drg": "850",
+  "title": "ACUTE LEUKEMIA WITH OTHER PROCEDURES"
+ },
+ {
+  "fy": "2025",
+  "change_type": "deleted",
+  "drg": "453",
+  "title": "COMBINED ANTERIOR AND POSTERIOR SPINAL FUSION WITH MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "deleted",
+  "drg": "454",
+  "title": "COMBINED ANTERIOR AND POSTERIOR SPINAL FUSION WITH CC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "deleted",
+  "drg": "455",
+  "title": "COMBINED ANTERIOR AND POSTERIOR SPINAL FUSION WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "deleted",
+  "drg": "459",
+  "title": "SPINAL FUSION EXCEPT CERVICAL WITH MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "deleted",
+  "drg": "460",
+  "title": "SPINAL FUSION EXCEPT CERVICAL WITHOUT MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "retitled",
+  "drg": "212",
+  "old_title": "CONCOMITANT AORTIC AND MITRAL VALVE PROCEDURES",
+  "new_title": "CONCOMITANT AORTIC AND MITRAL VALVE PROCEDURES"
+ },
+ {
+  "fy": "2025",
+  "change_type": "retitled",
+  "drg": "276",
+  "old_title": "CARDIAC DEFIBRILLATOR IMPLANT WITH MCC",
+  "new_title": "CARDIAC DEFIBRILLATOR IMPLANT WITH MCC OR CAROTID SINUS NEUROSTIMULATOR"
+ },
+ {
+  "fy": "2025",
+  "change_type": "retitled",
+  "drg": "834",
+  "old_title": "ACUTE LEUKEMIA WITHOUT MAJOR O.R. PROCEDURES WITH MCC",
+  "new_title": "ACUTE LEUKEMIA WITH MCC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "retitled",
+  "drg": "835",
+  "old_title": "ACUTE LEUKEMIA WITHOUT MAJOR O.R. PROCEDURES WITH CC",
+  "new_title": "ACUTE LEUKEMIA WITH CC"
+ },
+ {
+  "fy": "2025",
+  "change_type": "retitled",
+  "drg": "836",
+  "old_title": "ACUTE LEUKEMIA WITHOUT MAJOR O.R. PROCEDURES WITHOUT CC/MCC",
+  "new_title": "ACUTE LEUKEMIA WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "added",
+  "drg": "209",
+  "title": "COMPLEX AORTIC ARCH PROCEDURES"
+ },
+ {
+  "fy": "2026",
+  "change_type": "added",
+  "drg": "213",
+  "title": "ENDOVASCULAR ABDOMINAL AORTA WITH ILIAC BRANCH PROCEDURES"
+ },
+ {
+  "fy": "2026",
+  "change_type": "added",
+  "drg": "318",
+  "title": "PERCUTANEOUS CORONARY ATHERECTOMY WITHOUT INTRALUMINAL DEVICE"
+ },
+ {
+  "fy": "2026",
+  "change_type": "added",
+  "drg": "359",
+  "title": "PERCUTANEOUS CORONARY ATHERECTOMY WITH INTRALUMINAL DEVICE WITH MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "added",
+  "drg": "360",
+  "title": "PERCUTANEOUS CORONARY ATHERECTOMY WITH INTRALUMINAL DEVICE WITHOUT MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "deleted",
+  "drg": "077",
+  "title": "HYPERTENSIVE ENCEPHALOPATHY WITH MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "deleted",
+  "drg": "078",
+  "title": "HYPERTENSIVE ENCEPHALOPATHY WITH CC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "deleted",
+  "drg": "079",
+  "title": "HYPERTENSIVE ENCEPHALOPATHY WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "deleted",
+  "drg": "294",
+  "title": "DEEP VEIN THROMBOPHLEBITIS WITH CC/MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "deleted",
+  "drg": "295",
+  "title": "DEEP VEIN THROMBOPHLEBITIS WITHOUT CC/MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "deleted",
+  "drg": "509",
+  "title": "ARTHROSCOPY"
+ },
+ {
+  "fy": "2026",
+  "change_type": "retitled",
+  "drg": "023",
+  "old_title": "CRANIOTOMY WITH MAJOR DEVICE IMPLANT OR ACUTE COMPLEX CNS PRINCIPAL DIAGNOSIS WITH MCC OR CHEMOTHERAPY IMPLANT OR EPILEPSY WITH NEUROSTIMULATOR",
+  "new_title": "CRANIOTOMY WITH MAJOR DEVICE IMPLANT OR ACUTE COMPLEX CNS PRINCIPAL DIAGNOSIS WITH MCC OR ANTINEOPLASTIC IMPLANT OR EPILEPSY WITH NEUROSTIMULATOR"
+ },
+ {
+  "fy": "2026",
+  "change_type": "retitled",
+  "drg": "067",
+  "old_title": "NONSPECIFIC CVA AND PRECEREBRAL OCCLUSION WITHOUT INFARCTION WITH MCC",
+  "new_title": "PRECEREBRAL OCCLUSION WITHOUT INFARCTION WITH MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "retitled",
+  "drg": "068",
+  "old_title": "NONSPECIFIC CVA AND PRECEREBRAL OCCLUSION WITHOUT INFARCTION WITHOUT MCC",
+  "new_title": "PRECEREBRAL OCCLUSION WITHOUT INFARCTION WITHOUT MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "retitled",
+  "drg": "070",
+  "old_title": "NONSPECIFIC CEREBROVASCULAR DISORDERS WITH MCC",
+  "new_title": "OTHER CEREBROVASCULAR DISORDERS WITH MCC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "retitled",
+  "drg": "071",
+  "old_title": "NONSPECIFIC CEREBROVASCULAR DISORDERS WITH CC",
+  "new_title": "OTHER CEREBROVASCULAR DISORDERS WITH CC"
+ },
+ {
+  "fy": "2026",
+  "change_type": "retitled",
+  "drg": "072",
+  "old_title": "NONSPECIFIC CEREBROVASCULAR DISORDERS WITHOUT CC/MCC",
+  "new_title": "OTHER CEREBROVASCULAR DISORDERS WITHOUT CC/MCC"
+ }
+]

@@ -1,0 +1,238 @@
+{
+ "2023": {
+  "ms_drg_version": "v40",
+  "cms_id": "CMS-1771-F",
+  "new_diagnosis_codes": 1251,
+  "new_procedure_codes": 902,
+  "invalid_diagnosis_codes": 296,
+  "invalid_procedure_codes": 197,
+  "revised_diagnosis_titles": 39,
+  "revised_procedure_titles": 0,
+  "mcc_list_size": 3315,
+  "cc_list_size": 14814,
+  "mcc_additions": 35,
+  "mcc_deletions": 5,
+  "cc_additions": 136,
+  "cc_deletions": 12,
+  "notable_new_diagnosis": [
+   {
+    "code": "B37.31",
+    "description": "Acute candidiasis of vulva and vagina"
+   },
+   {
+    "code": "B37.32",
+    "description": "Chronic candidiasis of vulva and vagina"
+   },
+   {
+    "code": "D59.30",
+    "description": "Hemolytic-uremic syndrome, unspecified"
+   },
+   {
+    "code": "\"\"",
+    "description": ""
+   },
+   {
+    "code": "\"\"",
+    "description": ""
+   },
+   {
+    "code": "D59.31",
+    "description": "Infection-associated hemolytic-uremic syndrome"
+   },
+   {
+    "code": "\"\"",
+    "description": ""
+   },
+   {
+    "code": "\"\"",
+    "description": ""
+   },
+   {
+    "code": "D59.32",
+    "description": "Hereditary hemolytic-uremic syndrome"
+   },
+   {
+    "code": "\"\"",
+    "description": ""
+   }
+  ],
+  "source": "CMS-1771-F Tables 6A-6J (FY2023 IPPS Final Rule)"
+ },
+ "2024": {
+  "ms_drg_version": "v41",
+  "cms_id": "CMS-1785-F",
+  "new_diagnosis_codes": 477,
+  "new_procedure_codes": 471,
+  "invalid_diagnosis_codes": 38,
+  "invalid_procedure_codes": 11,
+  "revised_diagnosis_titles": 14,
+  "revised_procedure_titles": 110,
+  "mcc_list_size": 3330,
+  "cc_list_size": 14885,
+  "mcc_additions": 18,
+  "mcc_deletions": 3,
+  "cc_additions": 79,
+  "cc_deletions": 8,
+  "notable_new_diagnosis": [
+   {
+    "code": "A41.54",
+    "description": "Sepsis due to Acinetobacter baumannii"
+   },
+   {
+    "code": "\"\"",
+    "description": ""
+   },
+   {
+    "code": "\"\"",
+    "description": ""
+   },
+   {
+    "code": "B96.83",
+    "description": "Acinetobacter baumannii as the cause of diseases classified elsewhere"
+   },
+   {
+    "code": "D13.91",
+    "description": "Familial adenomatous polyposis"
+   },
+   {
+    "code": "D13.99",
+    "description": "Benign neoplasm of ill-defined sites within the digestive system"
+   },
+   {
+    "code": "D48.110",
+    "description": "Desmoid tumor of head and neck"
+   },
+   {
+    "code": "D48.111",
+    "description": "Desmoid tumor of chest wall"
+   },
+   {
+    "code": "D48.112",
+    "description": "Desmoid tumor, intrathoracic"
+   },
+   {
+    "code": "D48.113",
+    "description": "Desmoid tumor of abdominal wall"
+   }
+  ],
+  "source": "CMS-1785-F Tables 6A-6J (FY2024 IPPS Final Rule)"
+ },
+ "2025": {
+  "ms_drg_version": "v42",
+  "cms_id": "CMS-1808-F",
+  "new_diagnosis_codes": 305,
+  "new_procedure_codes": 1440,
+  "invalid_diagnosis_codes": 46,
+  "invalid_procedure_codes": 419,
+  "revised_diagnosis_titles": 16,
+  "revised_procedure_titles": 3,
+  "mcc_list_size": 3334,
+  "cc_list_size": 14971,
+  "mcc_additions": 4,
+  "mcc_deletions": 0,
+  "cc_additions": 104,
+  "cc_deletions": 18,
+  "notable_new_diagnosis": [
+   {
+    "code": "C81.0A",
+    "description": "Nodular lymphocyte predominant Hodgkin lymphoma, in remission"
+   },
+   {
+    "code": "C81.1A",
+    "description": "Nodular sclerosis Hodgkin lymphoma, in remission"
+   },
+   {
+    "code": "C81.2A",
+    "description": "Mixed cellularity Hodgkin lymphoma, in remission"
+   },
+   {
+    "code": "C81.3A",
+    "description": "Lymphocyte depleted Hodgkin lymphoma, in remission"
+   },
+   {
+    "code": "C81.4A",
+    "description": "Lymphocyte-rich Hodgkin lymphoma, in remission"
+   },
+   {
+    "code": "C81.7A",
+    "description": "Other Hodgkin lymphoma, in remission"
+   },
+   {
+    "code": "C81.9A",
+    "description": "Hodgkin lymphoma, unspecified, in remission"
+   },
+   {
+    "code": "C82.0A",
+    "description": "Follicular lymphoma grade I, in remission"
+   },
+   {
+    "code": "C82.1A",
+    "description": "Follicular lymphoma grade II, in remission"
+   },
+   {
+    "code": "C82.2A",
+    "description": "Follicular lymphoma grade III, unspecified, in remission"
+   }
+  ],
+  "source": "CMS-1808-F Tables 6A-6J (FY2025 IPPS Final Rule)"
+ },
+ "2026": {
+  "ms_drg_version": "v43",
+  "cms_id": "CMS-1833-F",
+  "new_diagnosis_codes": 543,
+  "new_procedure_codes": 708,
+  "invalid_diagnosis_codes": 30,
+  "invalid_procedure_codes": 87,
+  "revised_diagnosis_titles": 46,
+  "revised_procedure_titles": 2,
+  "mcc_list_size": 3354,
+  "cc_list_size": 15078,
+  "mcc_additions": 20,
+  "mcc_deletions": 0,
+  "cc_additions": 111,
+  "cc_deletions": 4,
+  "notable_new_diagnosis": [
+   {
+    "code": "B88.01",
+    "description": "Infestation by Demodex mites"
+   },
+   {
+    "code": "B88.09",
+    "description": "Other acariasis"
+   },
+   {
+    "code": "C50.A0",
+    "description": "Malignant inflammatory neoplasm of unspecified breast"
+   },
+   {
+    "code": "C50.A1",
+    "description": "Malignant inflammatory neoplasm of right breast"
+   },
+   {
+    "code": "C50.A2",
+    "description": "Malignant inflammatory neoplasm of left breast"
+   },
+   {
+    "code": "D71.1",
+    "description": "Leukocyte adhesion deficiency"
+   },
+   {
+    "code": "D71.8",
+    "description": "Other functional disorders of polymorphonuclear neutrophils"
+   },
+   {
+    "code": "D71.9",
+    "description": "Functional disorders of polymorphonuclear neutrophils, unspecified"
+   },
+   {
+    "code": "E11.A",
+    "description": "Type 2 diabetes mellitus without complications in remission"
+   },
+   {
+    "code": "E72.530",
+    "description": "Primary hyperoxaluria, type 1"
+   }
+  ],
+  "source": "CMS-1833-F Tables 6A-6J (FY2026 IPPS Final Rule)"
+ }
+}

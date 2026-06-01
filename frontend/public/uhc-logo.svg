@@ -1,0 +1,9 @@
+<svg width="260" height="44" viewBox="0 0 260 44" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="UnitedHealthcare">
+  <!-- PLACEHOLDER wordmark. Replace with the licensed official UnitedHealthcare logo asset. -->
+  <g>
+    <circle cx="22" cy="22" r="20" fill="#002677"/>
+    <path d="M14 13 v12 a8 8 0 0 0 16 0 V13" stroke="#FF612B" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="52" y="20" font-family="Inter, Segoe UI, sans-serif" font-size="17" font-weight="700" fill="#002677">United<tspan fill="#0066B3">Healthcare</tspan></text>
+  <text x="52" y="36" font-family="Inter, Segoe UI, sans-serif" font-size="10.5" font-weight="600" fill="#FF612B" letter-spacing="0.5">DRG Intelligence</text>
+</svg>
