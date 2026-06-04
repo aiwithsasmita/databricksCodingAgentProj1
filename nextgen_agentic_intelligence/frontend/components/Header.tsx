@@ -22,9 +22,7 @@ export default function Header() {
           <div className="text-[15px] font-bold tracking-tight text-uhc-blue">
             NextGen Agentic Intelligence
           </div>
-          <div className="text-[10px] uppercase tracking-[0.18em] text-gray-400">
-            Supervisor · Multi-Agent
-          </div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-gray-400">Supervisor · Multi-Agent</div>
         </div>
 
         {/* Powered by Optum */}
